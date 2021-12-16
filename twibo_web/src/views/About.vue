@@ -2,13 +2,19 @@
   <div id="about">
     <h2>Vue.js WebSocket Tutorial</h2>
     <el-button @click="sendMessage('hello')">Send Message</el-button>
+    <el-button @click="getReply('hello')">twibo</el-button>
+    <span>{{ message }}</span>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      message: "",
+    };
+  },
   sockets: {
-    //查看socket是否渲染成功
     connect() {
       console.log("链接成功");
     },
@@ -26,6 +32,7 @@ export default {
         type: "warning",
         duration: 10000,
       });
+      this.message = data;
       console.log("data", data); //接收的消息
     },
     received(res) {
@@ -34,13 +41,14 @@ export default {
   },
 
   mounted() {
-    console.log("page mounted");
-    this.$socket.connect();
-    this.$socket.emit("connect1", "test"); // 在页面加载时发起订阅，“STREAM_STATUS”是你跟后端约定好的主题名
+    this.$socket.emit("connect1"); // 在页面加载时发起订阅，“STREAM_STATUS”是你跟后端约定好的主题名
   },
   methods: {
     sendMessage(data) {
-      this.$socket.emit("test_input", data);
+      this.$socket.emit("message", data);
+    },
+    getReply(data) {
+      this.$socket.emit("auto_reply", data);
     },
   },
 };

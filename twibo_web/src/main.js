@@ -7,19 +7,19 @@ import inject from "@/plugins/inject";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import VueSocketio from "vue-socket.io";
-
+import socketIO from "socket.io-client";
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(inject);
 Vue.use(
   new VueSocketio({
     debug: true,
-    connection: "http://localhost:5000/",
-    /* 推荐使用vuex引入，方便多组件状态共享 */
-    options: { path: "/test_conn" },
+    connection: socketIO("http://localhost:5000/test_conn"),
+
     vuex: {
       store,
-      actionPrefix: "SOCKET_", // 前缀，为了区分vuex文件中响应函数和普通函数
+      actionPrefix: "SOCKET_",
+      mutationPrefix: "SOCKET_",
     },
   })
 );

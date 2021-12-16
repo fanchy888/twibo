@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <el-button type="primary" @click="test">fuck you</el-button>
+    <el-button type="primary" @click="test">Test</el-button>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   components: {},
   methods: {
     test() {
-      console.log("===fuck you");
+      console.log("click");
       this.$api.getUserInfo();
     },
   },

@@ -1,10 +1,9 @@
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
-import random
 
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketIO = SocketIO(app, cors_allowed_origins="*")
 
 
 @app.route('/api/users', methods=['GET'])
@@ -12,30 +11,28 @@ def get_user():
     return jsonify({'code': 200, 'data': 'hello'})
 
 
-@socketio.on('connect', namespace='/test_conn')
+@socketIO.on('connect', namespace='/test_conn')
 def test_connect():
-    while True:
-        socketio.sleep(5)
-        t = random_int_list(1, 100, 10)
-        socketio.emit('server_response',
-                      {'data': t},
-                      namespace='/test_conn')
+    print('connected')
 
 
-@socketio.on('test_input', namespace='/test_conn')
+@socketIO.on('connect1', namespace='/test_conn')
+def test_connect():
+    print('connected1')
+
+
+@socketIO.on('message', namespace='/test_conn')
 def test_input(message):
     # do someting
-    socketio.emit('test_received', '收到啦', namespace='/test_conn')
+    print(message)
+    socketIO.emit('received', '收到啦', namespace='/test_conn')
 
 
-def random_int_list(start, stop, length):
-    start, stop = (int(start), int(stop)) if start <= stop else (int(stop), int(start))
-    length = int(abs(length)) if length else 0
-    random_list = []
-    for i in range(length):
-        random_list.append(random.randint(start, stop))
-    return random_list
+@socketIO.on('auto_reply', namespace='/test_conn')
+def auto_reply(message):
+    print(message)
+    socketIO.emit('message', message[::-1], namespace='/test_conn')
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketIO.run(app)
