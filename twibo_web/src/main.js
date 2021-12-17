@@ -14,7 +14,9 @@ Vue.use(inject);
 Vue.use(
   new VueSocketio({
     debug: true,
-    connection: socketIO("http://localhost:5000/test_conn"),
+    connection: socketIO("http://localhost:5000/test_conn", {
+      transports: ["websocket"],
+    }),
 
     vuex: {
       store,

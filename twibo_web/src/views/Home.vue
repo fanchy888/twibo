@@ -11,7 +11,7 @@ export default {
   methods: {
     test() {
       console.log("click");
-      this.$api.getUserInfo();
+      this.$api.getUserInfo({ $query: { uid: 123 } });
     },
   },
 };
