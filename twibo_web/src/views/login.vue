@@ -6,16 +6,31 @@
           <img src="../assets/avatar.jpg" alt="" />
         </div>
         <div class="logo">Welcome to Twibo!</div>
-        <el-form>
-          <el-form-item label="" class="btn">
-            <el-button type="primary" size="medium" @click="login"
-              >Login</el-button
-            >
-            <el-button type="success" size="medium" @click="register"
-              >Register</el-button
-            >
+        <el-form v-model="formData" label-position="right" label-width="80px">
+          <el-form-item class="input-block">
+            <span slot="label" class="label">E-mail:</span>
+            <el-input
+              v-model="formData.email"
+              placeholder=""
+              maxlength="50"
+            ></el-input>
+          </el-form-item>
+          <el-form-item class="input-block">
+            <span slot="label" class="label">Password:</span>
+            <el-input
+              v-model="formData.password"
+              placeholder=""
+              show-password
+            ></el-input>
           </el-form-item>
         </el-form>
+        <div class="btn">
+          <el-button type="success" @click="login" round>Login</el-button>
+        </div>
+        <span class="foot"
+          >Don't hava an account?
+          <span class="foot-btn" @click="register">Register Now</span>
+        </span>
       </div>
     </transition>
   </div>
@@ -29,6 +44,10 @@ export default {
     return {
       show: false,
       timer: "",
+      formData: {
+        email: "",
+        password: "",
+      },
     };
   },
   mounted() {
@@ -39,12 +58,15 @@ export default {
   },
   methods: {
     login() {
-      console.log("login");
+      console.log("login", this.formData);
       // await this.$api.login();
       const token = "123";
       this.$store.commit("login", token);
       let redirect = decodeURIComponent(this.$route.query.redirect || "/");
       this.$router.push(redirect);
+    },
+    register() {
+      this.$router.push("/register");
     },
   },
 };
@@ -92,11 +114,32 @@ img {
   text-align: center;
   position: relative;
   margin-top: -40px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   height: 50px;
+}
+.input-block {
+  width: 330px;
+  padding-left: 40px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #8696a7;
 }
 .btn {
   position: relative;
   text-align: center;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+.foot {
+  font-size: 13px;
+  color: #bfbfbf;
+}
+.foot-btn {
+  color: #409eff;
+  font-size: 13px;
+}
+.foot-btn:hover {
+  color: #e6a23c;
+  cursor: pointer;
 }
 </style>
