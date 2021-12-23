@@ -6,4 +6,10 @@ export default [
     path: "/api/user",
     params: {},
   },
+  {
+    name: "register",
+    method: "POST",
+    desc: "register",
+    path: "/api/register",
+  },
 ];

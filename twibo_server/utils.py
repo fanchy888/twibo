@@ -1,7 +1,18 @@
 import random
 import time
-from datetime import datetime
 from base64 import b64encode
+from datetime import datetime
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+from base64 import b64decode
+
+from config import config
+
+
+def rsa_decrypt(message):
+    private_key = RSA.import_key(config.rsa_private_key)
+    cipher_rsa = PKCS1_v1_5.new(private_key)
+    return cipher_rsa.decrypt(b64decode(message), 0).decode('utf-8')
 
 
 def generate_id(prefix=''):
@@ -9,8 +20,3 @@ def generate_id(prefix=''):
     ts = datetime.fromtimestamp(ts).strftime('%y%m%d%H%M%S')
     encode_ts = ts.encode('utf-8')
     return f'{prefix}-{b64encode(encode_ts).decode("utf-8")}'
-
-
-if __name__ == '__main__':
-    for _ in range(10):
-        print(generate_id())

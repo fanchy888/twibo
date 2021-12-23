@@ -31,8 +31,17 @@ export default {
     clearTimeout(this.timer);
   },
   methods: {
-    submit() {
+    async submit() {
       console.log("submmit");
+      const param = {
+        $body: {
+          name: "root",
+          password: this.$getRsaCode("123456"),
+          email: "123@qq.com",
+        },
+      };
+      const user = await this.$api.register(param);
+      console.log(user);
     },
   },
 };

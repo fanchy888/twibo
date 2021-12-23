@@ -74,7 +74,7 @@ function responseFailFunc(responseError) {
       if (responseError.message === "Request failed with status code 504") {
         showError("Request Timeout", 0);
       } else {
-        showError(responseError.message, 0);
+        showError(responseError.response.data.msg, 0);
       }
     }
   }

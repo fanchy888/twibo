@@ -19,18 +19,20 @@
             <span slot="label" class="label">Password:</span>
             <el-input
               v-model="formData.password"
-              placeholder=""
+              maxlength="20"
+              minlength="8"
+              show-word-limit
               show-password
             ></el-input>
           </el-form-item>
         </el-form>
         <div class="btn">
-          <el-button type="success" @click="login" round>Login</el-button>
+          <el-button type="primary" @click="login" round>Login</el-button>
         </div>
-        <span class="foot"
-          >Don't hava an account?
+        <div class="foot">
+          Don't hava an account?
           <span class="foot-btn" @click="register">Register Now</span>
-        </span>
+        </div>
       </div>
     </transition>
   </div>
@@ -59,7 +61,10 @@ export default {
   methods: {
     login() {
       console.log("login", this.formData);
+      const encryptPasswd = this.$getRsaCode(this.formData.password);
+      console.log(encryptPasswd);
       // await this.$api.login();
+      this.$api.getUserInfo({ $query: { user_id: "user-MjExMjI0MDA0NjE5" } });
       const token = "123";
       this.$store.commit("login", token);
       let redirect = decodeURIComponent(this.$route.query.redirect || "/");
@@ -133,6 +138,7 @@ img {
 .foot {
   font-size: 13px;
   color: #bfbfbf;
+  text-align: center;
 }
 .foot-btn {
   color: #409eff;

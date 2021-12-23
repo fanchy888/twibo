@@ -1,4 +1,5 @@
-from sqlalchemy import INTEGER, VARCHAR, Column, or_, UniqueConstraint
+from sqlalchemy import INTEGER, VARCHAR, Boolean, Column, UniqueConstraint
+from werkzeug.security import generate_password_hash, check_password_hash
 from twibo_server.model.mysql_manager import session_manager, MixinBase, Base
 
 
@@ -8,8 +9,30 @@ class UserModel(Base, MixinBase):
     user_id = Column(VARCHAR(32), primary_key=True)
     name = Column(VARCHAR(32), nullable=False, unique=True)
     email = Column(VARCHAR(64), nullable=False, unique=True)  # register account
-    password = Column(VARCHAR(32), nullable=False)
+    _password_hash_ = Column(VARCHAR(256), nullable=False)
     avatar = Column(VARCHAR(128))
+    system_admin = Column(Boolean, default=False)
+
+    @classmethod
+    def get(cls, user_id):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.user_id == user_id).one_or_none()
+
+    @property
+    def password(self):
+        raise Exception('Unable to get password')
+
+    @password.setter
+    def password(self, value):
+        self._password_hash_ = generate_password_hash(str(value))
+
+    def check_password(self, passwd):
+        return check_password_hash(self._password_hash_, str(passwd))
+
+    @classmethod
+    def check_name(cls, name):
+        with session_manager() as session:
+            return bool(session.query(cls.name).filter(cls.name == name).all())
 
 
 class FriendModel(Base, MixinBase):
