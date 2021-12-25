@@ -6,28 +6,37 @@
           <img src="../assets/avatar.jpg" alt="" />
         </div>
         <div class="logo">Welcome to Twibo!</div>
-        <el-form v-model="formData" label-position="right" label-width="80px">
-          <el-form-item class="input-block">
+        <el-form
+          :model="formData"
+          label-position="right"
+          label-width="90px"
+          ref="formData"
+          :rules="rules"
+        >
+          <el-form-item class="input-block" prop="email">
             <span slot="label" class="label">E-mail:</span>
             <el-input
               v-model="formData.email"
               placeholder=""
               maxlength="50"
+              @change="formData.email = formData.email.trim()"
             ></el-input>
           </el-form-item>
-          <el-form-item class="input-block">
+          <el-form-item class="input-block" prop="password">
             <span slot="label" class="label">Password:</span>
             <el-input
               v-model="formData.password"
               maxlength="20"
               minlength="8"
-              show-word-limit
+              @change="formData.password = formData.password.trim()"
               show-password
             ></el-input>
           </el-form-item>
         </el-form>
         <div class="btn">
-          <el-button type="primary" @click="login" round>Login</el-button>
+          <el-button type="primary" @click="login('formData')" round
+            >Login</el-button
+          >
         </div>
         <div class="foot">
           Don't hava an account?
@@ -46,6 +55,18 @@ export default {
     return {
       show: false,
       timer: "",
+      rules: {
+        email: [
+          { required: true, message: "Email is required", trigger: "change" },
+        ],
+        password: [
+          {
+            required: true,
+            message: "Password is required",
+            trigger: "change",
+          },
+        ],
+      },
       formData: {
         email: "",
         password: "",
@@ -53,20 +74,25 @@ export default {
     };
   },
   mounted() {
-    this.timer = setTimeout(() => (this.show = true), 500);
+    this.timer = setTimeout(() => (this.show = true), 300);
   },
   beforeDestroy() {
     clearTimeout(this.timer);
   },
   methods: {
-    login() {
-      console.log("login", this.formData);
+    async login(name) {
+      this.$refs[name].validate((valid) => valid);
+      if (!this.formData.email || !this.formData.password) {
+        return;
+      }
       const encryptPasswd = this.$getRsaCode(this.formData.password);
-      console.log(encryptPasswd);
-      // await this.$api.login();
-      this.$api.getUserInfo({ $query: { user_id: "user-MjExMjI0MDA0NjE5" } });
-      const token = "123";
-      this.$store.commit("login", token);
+
+      const userInfo = await this.$api.login({
+        email: this.formData.email,
+        password: encryptPasswd,
+      });
+
+      this.$store.commit("login", userInfo);
       let redirect = decodeURIComponent(this.$route.query.redirect || "/");
       this.$router.push(redirect);
     },
@@ -123,8 +149,8 @@ img {
   height: 50px;
 }
 .input-block {
-  width: 330px;
-  padding-left: 40px;
+  width: 350px;
+  padding-left: 25px;
   font-size: 15px;
   font-weight: 600;
   color: #8696a7;

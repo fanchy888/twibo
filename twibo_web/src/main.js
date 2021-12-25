@@ -25,10 +25,12 @@ Vue.use(inject);
 Vue.use(
   new VueSocketio({
     debug: true,
-    connection: socketIO("http://localhost:5000/test_conn", {
+    connection: socketIO("http://localhost:5000/twibo", {
       transports: ["websocket"],
+      autoConnect: false,
+      reconnection: true,
     }),
-
+    options: { autoConnect: false },
     vuex: {
       store,
       actionPrefix: "SOCKET_",
@@ -39,5 +41,13 @@ Vue.use(
 new Vue({
   router,
   store,
+  sockets: {
+    connect() {
+      console.log("connected");
+    },
+    disconnect() {
+      console.log("disconnected");
+    },
+  },
   render: (h) => h(App),
 }).$mount("#app");

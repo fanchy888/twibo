@@ -12,4 +12,10 @@ export default [
     desc: "register",
     path: "/api/register",
   },
+  {
+    name: "login",
+    method: "POST",
+    desc: "login",
+    path: "/api/login",
+  },
 ];

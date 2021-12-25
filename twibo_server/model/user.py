@@ -18,6 +18,11 @@ class UserModel(Base, MixinBase):
         with session_manager() as session:
             return session.query(cls).filter(cls.user_id == user_id).one_or_none()
 
+    @classmethod
+    def get_by_email(cls, email):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.email == email).one_or_none()
+
     @property
     def password(self):
         raise Exception('Unable to get password')
@@ -33,6 +38,21 @@ class UserModel(Base, MixinBase):
     def check_name(cls, name):
         with session_manager() as session:
             return bool(session.query(cls.name).filter(cls.name == name).all())
+
+    @classmethod
+    def check_email(cls, email):
+        with session_manager() as session:
+            return bool(session.query(cls.email).filter(cls.email == email).all())
+
+    def to_json(self):
+        data = {
+            'name': self.name,
+            'user_id': self.user_id,
+            'email': self.email,
+            'avatar': self.avatar,
+            'system_admin': self.system_admin
+        }
+        return data
 
 
 class FriendModel(Base, MixinBase):

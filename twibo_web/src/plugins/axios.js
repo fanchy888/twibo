@@ -5,9 +5,7 @@ import { showError } from "@/utils/notification";
 const axiosPromiseArr = [];
 eventBus.$on("auth", () => {
   const { href, origin } = window.location;
-  window.location.href = `${origin}/oauth2/?forward=${encodeURIComponent(
-    href
-  )}`;
+  window.location.href = `${origin}/login/?forward=${encodeURIComponent(href)}`;
 });
 
 eventBus.$on("toHome", () => {
@@ -20,6 +18,7 @@ function requestSuccessFunc(requestObj) {
     requestObj.cancelToken = new axios.CancelToken((cancel) => {
       axiosPromiseArr.push({ cancel });
     });
+    requestObj.headers.Authentication = sessionStorage.getItem("token");
   }
 
   return requestObj;
@@ -46,6 +45,8 @@ function responseSuccessFunc(responseObj) {
   }
 
   if (code === 401) {
+    console.log("====", data);
+    showError(data.msg, 0);
     return eventBus.$emit("auth");
   }
 
@@ -74,7 +75,15 @@ function responseFailFunc(responseError) {
       if (responseError.message === "Request failed with status code 504") {
         showError("Request Timeout", 0);
       } else {
-        showError(responseError.response.data.msg, 0);
+        if (
+          responseError.response &&
+          responseError.response.data &&
+          responseError.response.data.msg
+        ) {
+          showError(responseError.response.data.msg, 0);
+        } else {
+          showError(responseError.message);
+        }
       }
     }
   }
