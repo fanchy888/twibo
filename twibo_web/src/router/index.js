@@ -23,13 +23,17 @@ const routes = [
     name: "register",
     component: register,
   },
-  {
-    path: "/youchat",
-    name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
-  },
 ];
+
+["push", "replace"].forEach((k) => {
+  const originalFn = VueRouter.prototype[k];
+  VueRouter.prototype[k] = function (location, onResolve, onReject) {
+    if (onResolve || onReject) {
+      return originalFn.call(this, location, onResolve, onReject);
+    }
+    return originalFn.call(this, location).catch((err) => err);
+  };
+});
 
 const router = new VueRouter({
   mode: "history",

@@ -1,6 +1,6 @@
-from flask import jsonify, g, request, abort
-from . import bp
-from .extentions import login_required
+from flask import jsonify, g, request, session
+from . import bp, login_required
+
 
 from twibo_server.lib.user import User
 
@@ -16,12 +16,20 @@ def register():
 def login():
     data = request.get_json()
     user = User.login(data)
+    session['user_id'] = user['user_id']
     return jsonify(meta={'code': 200}, data=user)
 
 
-@bp.route('/user', methods=['GET'])
+@bp.route('/logout', methods=['GET'])
 @login_required
-def get_user():
+def logout():
+    if session.get('user_id'):
+        session.pop('user_id')
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
+@bp.route('/friends', methods=['GET'])
+def get_friend():
     args = request.args
-    user_id = args['user_id']
+    user_id = g.user_id
     return jsonify(meta={'code': 200}, data={'user-name': User(user_id).name})

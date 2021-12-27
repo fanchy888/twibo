@@ -3,7 +3,7 @@ export default [
     name: "getUserInfo",
     method: "GET",
     desc: "测试接口1",
-    path: "/api/user",
+    path: "/api/friends",
     params: {},
   },
   {
@@ -17,5 +17,11 @@ export default [
     method: "POST",
     desc: "login",
     path: "/api/login",
+  },
+  {
+    name: "logout",
+    method: "GET",
+    desc: "logout",
+    path: "/api/logout",
   },
 ];

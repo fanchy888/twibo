@@ -1,15 +1,20 @@
 <template>
-  <div id="about">
-    <h2>Vue.js WebSocket Tutorial</h2>
-    <el-button @click="sendMessage('hello')">Send Message</el-button>
-    <el-button @click="getReply('hello')">twibo</el-button>
-    <span>{{ message }}</span>
-  </div>
+  <el-container class="home">
+    <el-header
+      ><span class="logo">Twibo</span
+      ><span class="head-btn" @click="logout">Logout</span></el-header
+    >
+
+    <el-container>
+      <el-aside width="200px">Aside</el-aside>
+      <el-main><router-view></router-view></el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
 export default {
-  name: "home",
+  name: "Home",
   data() {
     return {
       message: "",
@@ -30,6 +35,54 @@ export default {
     getReply(data) {
       this.$socket.emit("auto_reply", data);
     },
+    async logout() {
+      await this.$api.logout();
+      this.$store.commit("logout");
+      this.$router.push("/login");
+    },
   },
 };
 </script>
+<style lang="scss" scoped>
+.home {
+  background-color: #fffaf4;
+  height: 100%;
+  width: 100%;
+}
+.el-header {
+  background-color: #2c3e50;
+  text-align: center;
+  height: 80px !important;
+  line-height: 80px;
+}
+.logo {
+  color: #ececea;
+  font-family: "PingFang SC";
+  font-size: 30px;
+  font-weight: 600;
+  text-shadow: -4px 6px 3px #060606;
+}
+.head-btn {
+  color: #ececea;
+  float: right;
+  font-size: 14px;
+  margin-top: 20px;
+}
+.head-btn:hover {
+  color: #d3dce6;
+  cursor: pointer;
+}
+.el-aside {
+  background-color: #d3dce6;
+  color: #333;
+  text-align: center;
+  line-height: 200px;
+}
+
+.el-main {
+  background-color: #fffaf4;
+  color: #333;
+  text-align: center;
+  line-height: 160px;
+}
+</style>

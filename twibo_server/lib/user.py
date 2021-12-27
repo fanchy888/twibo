@@ -23,8 +23,6 @@ class User:
         self._model = model
 
     def __getattr__(self, item):
-        if not self._model:
-            self.model = UserModel.get(self.user_id)
         return getattr(self.model, item)
 
     @classmethod

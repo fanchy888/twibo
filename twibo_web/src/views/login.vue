@@ -91,7 +91,7 @@ export default {
         email: this.formData.email,
         password: encryptPasswd,
       });
-
+      await this.$api.getUserInfo({ user_id: userInfo.user_id });
       this.$store.commit("login", userInfo);
       let redirect = decodeURIComponent(this.$route.query.redirect || "/");
       this.$router.push(redirect);

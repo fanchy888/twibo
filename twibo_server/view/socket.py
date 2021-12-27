@@ -1,5 +1,4 @@
 from twibo_server import socketIO
-from .extentions import login_required
 
 
 @socketIO.on('connect', namespace='/twibo')

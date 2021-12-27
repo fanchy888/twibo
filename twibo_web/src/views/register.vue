@@ -182,7 +182,11 @@ export default {
       }
     },
     login() {
-      this.$router.push("/login");
+      if (!sessionStorage.token) {
+        this.$router.push("/login");
+      } else {
+        this.$router.push("/");
+      }
     },
   },
 };
