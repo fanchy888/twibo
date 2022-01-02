@@ -29,6 +29,7 @@ def logout():
 
 
 @bp.route('/friends', methods=['GET'])
+@login_required
 def get_friend():
     args = request.args
     user_id = g.user_id

@@ -2,16 +2,12 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import login from "../views/login";
 import register from "../views/register";
-import home from "../views/home";
+import { makeRouteConfig } from "./helper";
+import home from "./modules/home";
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: home,
-  },
+const baseRoutes = [
   {
     path: "/login",
     name: "login",
@@ -24,6 +20,8 @@ const routes = [
     component: register,
   },
 ];
+
+const allRoutes = [makeRouteConfig(home)];
 
 ["push", "replace"].forEach((k) => {
   const originalFn = VueRouter.prototype[k];
@@ -38,7 +36,7 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes,
+  routes: [...baseRoutes, ...allRoutes],
 });
 
 router.beforeEach((to, from, next) => {
@@ -56,6 +54,8 @@ router.beforeEach((to, from, next) => {
         path: "/login",
         query: { redirect: to.fullPath },
       });
+    } else if (to.path === "/") {
+      next({ path: "/uchat" });
     } else {
       next();
     }

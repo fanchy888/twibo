@@ -6,7 +6,7 @@ from twibo_server.model.mysql_manager import session_manager, MixinBase, Base
 class UserModel(Base, MixinBase):
     __tablename__ = 'User'
 
-    user_id = Column(VARCHAR(32), primary_key=True)
+    user_id = Column(INTEGER, primary_key=True, autoincrement=True)
     name = Column(VARCHAR(32), nullable=False, unique=True)
     email = Column(VARCHAR(64), nullable=False, unique=True)  # register account
     _password_hash_ = Column(VARCHAR(256), nullable=False)

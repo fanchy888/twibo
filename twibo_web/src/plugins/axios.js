@@ -45,7 +45,6 @@ function responseSuccessFunc(responseObj) {
   }
 
   if (code === 401) {
-    console.log("====", data);
     showError(data.msg, 0);
     return eventBus.$emit("auth");
   }
