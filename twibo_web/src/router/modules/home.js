@@ -1,6 +1,7 @@
 import home from "@/views/home";
 import youChat from "@/components/youchat";
 import twibo from "@/components/twibo";
+import setting from "@/components/setting";
 export default {
   title: "home",
   icon: "home",
@@ -20,6 +21,13 @@ export default {
       name: "twibo",
       path: "twibo",
       component: twibo,
+      props: (route) => ({ query: route.query }),
+    },
+    {
+      title: "setting",
+      name: "setting",
+      path: "setting",
+      component: setting,
       props: (route) => ({ query: route.query }),
     },
   ],

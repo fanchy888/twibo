@@ -10,6 +10,7 @@ import VueSocketio from "vue-socket.io";
 import socketIO from "socket.io-client";
 import JSEncrypt from "jsencrypt";
 import { rsaPublicKey } from "./rsa";
+import { staticUrl } from "@/utils/common";
 Vue.config.productionTip = false;
 
 Vue.prototype.$getRsaCode = function (str) {
@@ -19,6 +20,8 @@ Vue.prototype.$getRsaCode = function (str) {
   let data = encryptStr.encrypt(str.toString());
   return data;
 };
+
+Vue.prototype.$staticUrl = staticUrl;
 
 Vue.use(ElementUI);
 Vue.use(inject);

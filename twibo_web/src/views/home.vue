@@ -1,31 +1,49 @@
 <template>
   <el-container class="home">
     <el-header
-      ><span class="logo">Twibo</span
-      ><span class="head-btn" @click="logout">Logout</span>
+      ><span class="logo">Twibo</span>
+      <span class="head-btn">
+        <el-dropdown trigger="click">
+          <div class="avatar">
+            <el-avatar v-if="user && user.avatar" :size="40" :src="avatarUrl" />
+            <i v-else class="el-icon-picture-outline"></i>
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <span @click="jumpTo('setting')"
+                ><i class="el-icon-setting"></i>Settings</span
+              >
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <span @click="logout"><i class="el-icon-ship"></i>Logout</span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </span>
     </el-header>
 
     <el-container>
       <el-aside>
         <el-col :span="20" style="height: 100%">
           <el-menu
-            default-active="1"
+            default-active="twibo"
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b"
             class="menu"
+            router
           >
-            <el-menu-item index="1">
+            <el-menu-item index="twibo">
               <i class="el-icon-s-promotion"></i>
-              <span slot="title" @click="jumpTo('twibo')">Twibo</span>
+              <span slot="title">Twibo</span>
             </el-menu-item>
-            <el-menu-item index="2">
+            <el-menu-item index="uchat">
               <i class="el-icon-s-comment"></i>
-              <span slot="title" @click="jumpTo('uchat')">uChat</span>
-            </el-menu-item>
-            <el-menu-item index="3">
-              <i class="el-icon-menu"></i>
               <span slot="title">uChat</span>
+            </el-menu-item>
+            <el-menu-item index="">
+              <i class="el-icon-edit"></i>
+              <span slot="title">Notes</span>
             </el-menu-item>
           </el-menu>
         </el-col>
@@ -36,12 +54,22 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+import { currentUser } from "@/utils/user";
 export default {
   name: "Home",
   data() {
     return {
       message: "",
     };
+  },
+  computed: {
+    user() {
+      return currentUser();
+    },
+    avatarUrl() {
+      return this.$staticUrl + this.user.avatar;
+    },
   },
   mounted() {
     if (!this.$store.state.Socket.isConnected) {
@@ -50,8 +78,10 @@ export default {
     this.sockets.subscribe("message", (data) => {
       console.log(data);
     });
+    this.getUserInfo();
   },
   methods: {
+    ...mapActions(["getUserInfo"]),
     sendMessage(data) {
       this.$socket.emit("message", data);
     },
@@ -64,7 +94,8 @@ export default {
       this.$router.push("/login");
     },
     jumpTo(name) {
-      this.$router.push({ name: name });
+      const routeParam = { name: name };
+      this.$router.push(routeParam);
     },
   },
 };
@@ -78,8 +109,8 @@ export default {
 .el-header {
   background-color: #2c3e50;
   text-align: center;
-  height: 80px !important;
-  line-height: 80px;
+  height: 70px !important;
+  line-height: 70px;
 }
 .logo {
   color: #ececea;
@@ -89,19 +120,25 @@ export default {
   text-shadow: -4px 6px 3px #060606;
 }
 .head-btn {
-  color: #ececea;
   float: right;
-  font-size: 14px;
-  margin-top: 20px;
+  height: 70px;
+  .el-dropdown {
+    font-size: 30px;
+    color: #ececea;
+  }
+  .avatar {
+    padding: 10px;
+    height: 70px;
+  }
+  .avatar :hover {
+    cursor: pointer;
+  }
 }
-.head-btn:hover {
-  color: #d3dce6;
-  cursor: pointer;
-}
+
 .el-aside {
   line-height: 200px;
   height: 100%;
-  width: 200px;
+  width: 200px !important;
 }
 
 .el-main {

@@ -17,6 +17,7 @@ def login():
     data = request.get_json()
     user = User.login(data)
     session['user_id'] = user['user_id']
+    user['avatar'] = 'avatar.jpg'
     return jsonify(meta={'code': 200}, data=user)
 
 
@@ -28,9 +29,11 @@ def logout():
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/friends', methods=['GET'])
+@bp.route('/user', methods=['GET'])
 @login_required
-def get_friend():
-    args = request.args
-    user_id = g.user_id
-    return jsonify(meta={'code': 200}, data={'user-name': User(user_id).name})
+def get_user_info():
+    user_id = request.args.get('user_id')
+    user = User.get_user(user_id)
+    user['avatar'] = 'avatar.jpg'
+    return jsonify(meta={'code': 200}, data=user)
+

@@ -27,7 +27,10 @@ class User:
 
     @classmethod
     def get_user(cls, user_id):
-        return UserModel.get(user_id)
+        user = UserModel.get(user_id)
+        if not user:
+            raise ParameterError(400, 'User not found')
+        return user.to_json()
 
     @classmethod
     def create(cls, data):

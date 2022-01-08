@@ -54,8 +54,8 @@ router.beforeEach((to, from, next) => {
         path: "/login",
         query: { redirect: to.fullPath },
       });
-    } else if (to.path === "/") {
-      next({ path: "/uchat" });
+    } else if (to.matched.length === 0 || to.path === "/") {
+      next({ path: "/twibo" });
     } else {
       next();
     }
