@@ -17,7 +17,6 @@ def login():
     data = request.get_json()
     user = User.login(data)
     session['user_id'] = user['user_id']
-    user['avatar'] = 'avatar.jpg'
     return jsonify(meta={'code': 200}, data=user)
 
 
@@ -34,6 +33,14 @@ def logout():
 def get_user_info():
     user_id = request.args.get('user_id')
     user = User.get_user(user_id)
-    user['avatar'] = 'avatar.jpg'
     return jsonify(meta={'code': 200}, data=user)
+
+
+@bp.route('/upload', methods=['POST'])
+@login_required
+def upload():
+    file = request.files.get('file')
+    data = dict(request.form)
+    User.upload_file(file, data)
+    return jsonify(meta={'code': 200}, data={'success': True})
 

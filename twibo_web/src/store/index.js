@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import api from "@/plugins/api";
 import Socket from "./socket";
+import { currentUser } from "@/utils/user";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -28,9 +29,10 @@ export default new Vuex.Store({
   },
   actions: {
     async getUserInfo({ commit }) {
-      if (sessionStorage.currentUser) {
+      const { user_id } = currentUser();
+      if (user_id) {
         const userInfo = await api.getUserInfo({
-          user_id: sessionStorage.currentUser.user_id,
+          $query: { user_id: user_id },
         });
         sessionStorage.userInfo = JSON.stringify(userInfo);
         commit("SET_STATE", { currentUser: userInfo });

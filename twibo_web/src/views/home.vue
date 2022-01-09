@@ -3,11 +3,16 @@
     <el-header
       ><span class="logo">Twibo</span>
       <span class="head-btn">
-        <el-dropdown trigger="click">
-          <div class="avatar">
-            <el-avatar v-if="user && user.avatar" :size="40" :src="avatarUrl" />
-            <i v-else class="el-icon-picture-outline"></i>
-          </div>
+        <el-dropdown trigger="click" class="avatar">
+          <el-avatar
+            v-if="user && user.avatar"
+            :size="40"
+            :src="avatarUrl"
+            class="ava-child"
+          />
+          <el-avatar v-else :size="40" icon="el-icon-user" class="ava-child">
+          </el-avatar>
+
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
               <span @click="jumpTo('setting')"
@@ -54,8 +59,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import { currentUser } from "@/utils/user";
+import { mapActions, mapState } from "vuex";
+
 export default {
   name: "Home",
   data() {
@@ -64,11 +69,11 @@ export default {
     };
   },
   computed: {
-    user() {
-      return currentUser();
-    },
+    ...mapState({
+      user: (state) => state.currentUser,
+    }),
     avatarUrl() {
-      return this.$staticUrl + this.user.avatar;
+      return this.user ? this.$staticUrl + this.user.avatar : "";
     },
   },
   mounted() {
@@ -129,9 +134,14 @@ export default {
   .avatar {
     padding: 10px;
     height: 70px;
+    width: 70px;
   }
   .avatar :hover {
     cursor: pointer;
+    box-shadow: 0 0 1px 2px #fdf9ee;
+  }
+  .ava-child :hover {
+    box-shadow: unset;
   }
 }
 

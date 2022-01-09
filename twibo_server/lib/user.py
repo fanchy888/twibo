@@ -1,4 +1,6 @@
+import os.path
 
+from twibo_server.config import config
 from twibo_server.model.user import UserModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id
@@ -69,3 +71,20 @@ class User:
         # todo: optimize generate token
         data['token'] = user.user_id
         return data
+
+    @classmethod
+    def upload_file(cls, file, data):
+        base_path = config.static_path
+        file_type = data['type']
+        user_id = data['user_id']
+        suffix = file.filename.split('.')[-1]
+        file_name = file.filename
+        if file_type == 'avatar':
+            if suffix not in config.avatar_type:
+                raise ParameterError(400, f'不支持文件格式 .{suffix}')
+            file_name = f'avatar-{user_id}.{suffix}'
+            user = UserModel.get(user_id)
+            user.avatar = file_name
+            user.save()
+        file_path = os.path.join(base_path, file_name)
+        file.save(file_path)

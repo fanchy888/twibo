@@ -24,4 +24,9 @@ export default [
     desc: "logout",
     path: "/api/logout",
   },
+  {
+    name: "upload",
+    method: "POST",
+    path: "/api/upload",
+  },
 ];
