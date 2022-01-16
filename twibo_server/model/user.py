@@ -44,6 +44,11 @@ class UserModel(Base, MixinBase):
         with session_manager() as session:
             return bool(session.query(cls.email).filter(cls.email == email).all())
 
+    @classmethod
+    def check_duplicate_name(cls, name, user_id):
+        with session_manager() as session:
+            return bool(session.query(cls.user_id != user_id, cls.name == name).all())
+
     def to_json(self):
         data = {
             'name': self.name,

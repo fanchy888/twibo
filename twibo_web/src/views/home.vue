@@ -31,7 +31,7 @@
       <el-aside>
         <el-col :span="20" style="height: 100%">
           <el-menu
-            default-active="twibo"
+            :default-active="active"
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b"
@@ -66,6 +66,7 @@ export default {
   data() {
     return {
       message: "",
+      active: "twibo",
     };
   },
   computed: {
@@ -84,6 +85,7 @@ export default {
       console.log(data);
     });
     this.getUserInfo();
+    this.active = this.$route.name;
   },
   methods: {
     ...mapActions(["getUserInfo"]),
@@ -119,7 +121,7 @@ export default {
 }
 .logo {
   color: #ececea;
-  font-family: "PingFang SC";
+  // font-family: "PingFang SC";
   font-size: 30px;
   font-weight: 600;
   text-shadow: -4px 6px 3px #060606;

@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="always" class="card">
+  <el-card shadow="always" style="height: 100%">
     <div class="avatar">
       <el-upload
         action="a"
@@ -23,7 +23,35 @@
         </div>
       </el-upload>
     </div>
-    <div class="name">昵称：{{ user.name }}</div>
+    <el-form
+      v-loading="loading"
+      :model="userForm"
+      ref="formData"
+      label-width="100px"
+      label-position="right"
+      class="user-form"
+    >
+      <el-form-item label="昵称:">
+        <el-input
+          v-model="userForm.name"
+          maxlength="20"
+          show-word-limit
+          @change="userForm.name = userForm.name.trim()"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="签名:">
+        <el-input
+          v-model="userForm.sign"
+          maxlength="50"
+          show-word-limit
+          @change="userForm.sign = userForm.sign.trim()"
+          type="textarea"
+        ></el-input>
+      </el-form-item>
+    </el-form>
+    <el-button @click="updateInfo" type="primary" round plain class="btn"
+      >保存</el-button
+    >
   </el-card>
 </template>
 <script>
@@ -33,6 +61,7 @@ export default {
   data() {
     return {
       loading: false,
+      userForm: { name: "", sign: "" },
     };
   },
   computed: {
@@ -46,10 +75,11 @@ export default {
       return this.user && this.user.avatar ? "点击修改头像" : "上传头像";
     },
   },
-  mounted() {
+  async mounted() {
     if (!this.user) {
-      this.getUserInfo();
+      await this.getUserInfo();
     }
+    this.userForm.name = this.user.name;
   },
   methods: {
     ...mapActions(["getUserInfo"]),
@@ -86,13 +116,31 @@ export default {
       }
       return isValidSize && isValidType;
     },
+    async updateInfo() {
+      this.loading = true;
+      try {
+        const param = {
+          $query: {
+            user_id: this.user.user_id,
+          },
+          $body: this.userForm,
+        };
+        const res = await this.$api.updateUserInfo(param);
+        await this.getUserInfo();
+        if (res.success) {
+          this.$message({
+            message: "更新成功",
+            type: "success",
+          });
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
-.card {
-  font-family: "PingFang SC";
-}
 .avatar {
   height: 100px;
   width: 100px;
@@ -112,8 +160,15 @@ export default {
     box-shadow: unset;
   }
 }
-.name {
-  padding: 10px;
-  line-height: 20px;
+.user-form {
+  width: 400px;
+  margin-left: 35%;
+  margin-top: 50px;
+  line-height: 50px;
+}
+.btn {
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 10px;
 }
 </style>

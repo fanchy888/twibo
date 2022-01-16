@@ -1,5 +1,5 @@
 import home from "@/views/home";
-import youChat from "@/components/youchat";
+import youChat from "@/components/uchat";
 import twibo from "@/components/twibo";
 import setting from "@/components/setting";
 export default {

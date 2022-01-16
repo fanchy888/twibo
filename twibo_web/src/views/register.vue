@@ -13,6 +13,15 @@
           :rules="rules"
           label-position="left"
         >
+          <el-form-item class="input-block" prop="email">
+            <span slot="label" class="label">Acount:</span>
+            <el-input
+              v-model="formData.email"
+              placeholder=""
+              maxlength="50"
+              @change="formData.email = formData.email.trim()"
+            ></el-input>
+          </el-form-item>
           <el-form-item class="input-block" prop="name">
             <span slot="label" class="label">Name:</span>
             <el-input
@@ -23,15 +32,7 @@
               @change="formData.name = formData.name.trim()"
             ></el-input>
           </el-form-item>
-          <el-form-item class="input-block" prop="email">
-            <span slot="label" class="label">E-mail:</span>
-            <el-input
-              v-model="formData.email"
-              placeholder=""
-              maxlength="50"
-              @change="formData.email = formData.email.trim()"
-            ></el-input>
-          </el-form-item>
+
           <el-form-item class="input-block" prop="password">
             <span slot="label" class="label">Password:</span>
             <el-input

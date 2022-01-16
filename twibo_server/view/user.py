@@ -1,4 +1,4 @@
-from flask import jsonify, g, request, session
+from flask import jsonify, g, request, session, abort
 from . import bp, login_required
 
 
@@ -34,6 +34,17 @@ def get_user_info():
     user_id = request.args.get('user_id')
     user = User.get_user(user_id)
     return jsonify(meta={'code': 200}, data=user)
+
+
+@bp.route('/user', methods=['PATCH'])
+@login_required
+def update_user_info():
+    user_id = request.args.get('user_id')
+    if g.user_id != user_id:
+        abort(400, 'No Access!')
+    data = request.get_json()
+    User(user_id).update_info(data)
+    return jsonify(meta={'code': 200}, data={'success': True})
 
 
 @bp.route('/upload', methods=['POST'])

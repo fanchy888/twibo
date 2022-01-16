@@ -29,4 +29,9 @@ export default [
     method: "POST",
     path: "/api/upload",
   },
+  {
+    name: "updateUserInfo",
+    method: "PATCH",
+    path: "/api/user",
+  },
 ];

@@ -43,7 +43,7 @@ class User:
         if UserModel.check_name(name):
             raise ParameterError(400, f'User {name} has already existed')
         if UserModel.check_email(email):
-            raise ParameterError(400, f'Email has already been used')
+            raise ParameterError(400, f'Account {email} has already been used')
         user_id = generate_id('user')
 
         user = {
@@ -88,3 +88,10 @@ class User:
             user.save()
         file_path = os.path.join(base_path, file_name)
         file.save(file_path)
+
+    def update_info(self, data):
+        name = data['name']
+        if not UserModel.check_duplicate_name(name, self.user_id):
+            raise ParameterError(400, f'User {name} has already existed')
+        self.model.name = name
+        self.model.save()

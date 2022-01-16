@@ -14,10 +14,10 @@
           :rules="rules"
         >
           <el-form-item class="input-block" prop="email">
-            <span slot="label" class="label">E-mail:</span>
+            <span slot="label" class="label">Account:</span>
             <el-input
               v-model="formData.email"
-              placeholder=""
+              placeholder="请输入账号"
               maxlength="50"
               @change="formData.email = formData.email.trim()"
             ></el-input>
@@ -28,16 +28,22 @@
               v-model="formData.password"
               maxlength="20"
               minlength="8"
+              placeholder="请输入密码"
               @change="formData.password = formData.password.trim()"
               show-password
             ></el-input>
           </el-form-item>
+          <div class="btn">
+            <el-button
+              type="primary"
+              @click="login('formData')"
+              native-type="submit"
+              round
+              >Login</el-button
+            >
+          </div>
         </el-form>
-        <div class="btn">
-          <el-button type="primary" @click="login('formData')" round
-            >Login</el-button
-          >
-        </div>
+
         <div class="foot">
           Don't hava an account?
           <span class="foot-btn" @click="register">Register Now</span>
