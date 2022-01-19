@@ -9,21 +9,23 @@
         <el-form
           :model="formData"
           label-position="right"
-          label-width="90px"
+          label-width="50px"
           ref="formData"
           :rules="rules"
         >
           <el-form-item class="input-block" prop="email">
-            <span slot="label" class="label">Account:</span>
+            <!-- <span slot="label" class="label">Account:</span> -->
             <el-input
               v-model="formData.email"
               placeholder="请输入账号"
               maxlength="50"
               @change="formData.email = formData.email.trim()"
-            ></el-input>
+            >
+              <i slot="prefix" class="el-input__icon el-icon-user"></i>
+            </el-input>
           </el-form-item>
           <el-form-item class="input-block" prop="password">
-            <span slot="label" class="label">Password:</span>
+            <!-- <span slot="label" class="label">Password:</span> -->
             <el-input
               v-model="formData.password"
               maxlength="20"
@@ -31,7 +33,9 @@
               placeholder="请输入密码"
               @change="formData.password = formData.password.trim()"
               show-password
-            ></el-input>
+            >
+              <i slot="prefix" class="el-input__icon el-icon-lock"></i>
+            </el-input>
           </el-form-item>
           <div class="btn">
             <el-button
@@ -154,7 +158,7 @@ img {
   height: 50px;
 }
 .input-block {
-  width: 350px;
+  width: 320px;
   padding-left: 25px;
   font-size: 15px;
   font-weight: 600;
