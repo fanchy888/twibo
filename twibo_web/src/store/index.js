@@ -14,8 +14,8 @@ export default new Vuex.Store({
     login(state, userInfo) {
       state.token = userInfo.token;
       state.currentUser = { ...userInfo };
-      sessionStorage.userInfo = JSON.stringify(userInfo);
-      sessionStorage.token = userInfo.token;
+      sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+      sessionStorage.setItem("token", userInfo.token);
     },
     logout(state) {
       state.token = null;
@@ -34,7 +34,8 @@ export default new Vuex.Store({
         const userInfo = await api.getUserInfo({
           $query: { user_id: user_id },
         });
-        sessionStorage.userInfo = JSON.stringify(userInfo);
+        sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+
         commit("SET_STATE", { currentUser: userInfo });
       }
     },

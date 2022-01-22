@@ -19,6 +19,10 @@ const baseRoutes = [
     name: "register",
     component: register,
   },
+  {
+    path: "*",
+    redirect: "/twibo",
+  },
 ];
 
 const allRoutes = [makeRouteConfig(home)];
@@ -54,7 +58,7 @@ router.beforeEach((to, from, next) => {
         path: "/login",
         query: { redirect: to.fullPath },
       });
-    } else if (to.matched.length === 0 || to.path === "/") {
+    } else if (to.path === "/") {
       next({ path: "/twibo" });
     } else {
       next();

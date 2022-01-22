@@ -5,7 +5,7 @@ class Config:
 
     @property
     def sqldb_url(self):
-        return 'mysql+pymysql://root:fan4308832@localhost:3306/twibo'
+        return 'mysql+pymysql://root:fan4308832@localhost:3306/twibo?charset=utf8mb4'
 
     @property
     def rsa_private_key(self):

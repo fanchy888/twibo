@@ -84,7 +84,9 @@ export default {
     this.sockets.subscribe("message", (data) => {
       console.log(data);
     });
-    this.getUserInfo();
+    if (!this.user) {
+      this.getUserInfo();
+    }
     this.active = this.$route.name;
   },
   methods: {

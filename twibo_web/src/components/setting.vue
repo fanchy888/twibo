@@ -41,10 +41,10 @@
       </el-form-item>
       <el-form-item label="签名:">
         <el-input
-          v-model="userForm.sign"
+          v-model="userForm.description"
           maxlength="50"
           show-word-limit
-          @change="userForm.sign = userForm.sign.trim()"
+          @change="userForm.description = userForm.description.trim()"
           type="textarea"
         ></el-input>
       </el-form-item>
@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       loading: false,
-      userForm: { name: "", sign: "" },
+      userForm: { name: "", description: "" },
     };
   },
   computed: {
@@ -80,6 +80,7 @@ export default {
       await this.getUserInfo();
     }
     this.userForm.name = this.user.name;
+    this.userForm.description = this.user.description;
   },
   methods: {
     ...mapActions(["getUserInfo"]),

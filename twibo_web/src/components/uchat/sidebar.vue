@@ -19,19 +19,24 @@
         ></span>
         <div class="chat">
           <div
-            v-for="(chat, index) in chatList"
+            v-for="(chat, index) in filterdChatList"
             :key="index.toString()"
             class="chat-item"
+            @click="read(chat)"
           >
-            <el-avatar
-              v-if="chat.avatar"
-              :src="avatarSrc(chat.avatar)"
-              :size="40"
-              shape="square"
-            ></el-avatar>
-            <el-avatar v-else :size="40" shape="square">
-              <span style="font-size: 30px"><i class="el-icon-user"></i></span>
-            </el-avatar>
+            <el-badge is-dot style="height: 40px" :hidden="!chat.new">
+              <el-avatar
+                v-if="chat.avatar"
+                :src="avatarSrc(chat.avatar)"
+                :size="40"
+                shape="square"
+              ></el-avatar>
+              <el-avatar v-else :size="40" shape="square">
+                <span style="font-size: 30px"
+                  ><i class="el-icon-user"></i
+                ></span>
+              </el-avatar>
+            </el-badge>
             <div class="chat-item-info">
               <div class="chat-item-name">
                 <div class="name">{{ chat.name }}</div>
@@ -55,7 +60,7 @@
             >
           </div>
           <div
-            v-for="(friend, index) in friendList"
+            v-for="(friend, index) in filterdFriends"
             :key="index.toString()"
             class="chat-item"
           >
@@ -67,7 +72,18 @@
             <el-avatar v-else :size="40">
               <span style="font-size: 30px"><i class="el-icon-user"></i></span>
             </el-avatar>
-            <div class="friend">{{ friend.name }}</div>
+            <div class="friend">
+              <span style="text-overflow: ellipsis; overflow: hidden">{{
+                friend.nick_name || friend.name
+              }}</span>
+              <el-popover placement="right">
+                <el-button
+                  slot="reference"
+                  icon="el-icon-edit"
+                  circle
+                ></el-button>
+              </el-popover>
+            </div>
           </div>
         </div>
       </el-tab-pane>
@@ -76,27 +92,71 @@
       <div class="search">
         <el-input
           prefix-icon="el-icon-search"
-          v-model="searchUser"
+          v-model="searchUserText"
           placeholder="搜一搜"
-          @change="getUser"
+          @change="getUserByName"
+          maxlength="10"
         ></el-input>
       </div>
-      <div class="search-result">No Result</div>
+      <div class="search-result" v-loading="dloading">
+        <div v-if="searchResult" class="item">
+          <div class="left">
+            <el-avatar
+              v-if="user.avatar"
+              :src="avatarSrc(user.avatar)"
+              :size="80"
+            ></el-avatar>
+            <el-avatar v-else :size="80">
+              <span style="font-size: 50px"><i class="el-icon-user"></i></span>
+            </el-avatar>
+          </div>
+          <div class="right">
+            <div class="result-name">
+              {{ user.name }}
+            </div>
+            <div class="result-des">
+              {{ user.description }}
+            </div>
+            <el-button type="success" size="medium" @click="addFriend"
+              >Add</el-button
+            >
+          </div>
+        </div>
+        <div v-else>无结果</div>
+      </div>
     </el-dialog>
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
 export default {
   name: "sideBar",
   data() {
     return {
       activeName: "chat",
       chatList: [],
-      friendList: ["a", "b"],
+      friendList: [],
       searchInfo: "",
       addVisible: false,
-      searchUser: "",
+      searchUserText: "",
+      searchResult: null,
+      dloading: false,
     };
+  },
+  computed: {
+    ...mapState({
+      user: (state) => state.currentUser,
+    }),
+    filterdFriends() {
+      return this.friendList.filter(
+        (f) =>
+          (f.nick_name && f.nick_name.includes(this.searchInfo)) ||
+          f.name.includes(this.searchInfo)
+      );
+    },
+    filterdChatList() {
+      return this.chatList.filter((f) => f.name.includes(this.searchInfo));
+    },
   },
   mounted() {
     this.chatList.push({
@@ -104,6 +164,8 @@ export default {
       name: "test",
       lastMsg: "nihaoaaaaaaaaaaaaaaaaaaaaaaa",
       time: "19:20",
+      nick_name: "nick_1",
+      new: true,
     });
     this.chatList.push({
       avatar: "",
@@ -111,6 +173,7 @@ export default {
       lastMsg: "",
       time: "",
     });
+
     this.friendList = [
       ...this.chatList,
       ...this.chatList,
@@ -121,14 +184,40 @@ export default {
       ...this.chatList,
       ...this.chatList,
     ];
+    this.friendList.unshift({
+      avatar: "avatar.jpg",
+      name: "gggggggggggggggggggggggggggggggggggggggggg",
+      lastMsg: "nihaoaaaaaaaaaaaaaaaaaaaaaaa",
+      time: "19:20",
+      nick_name: "nick_1",
+    });
   },
   methods: {
     handleClick() {},
     avatarSrc(avatar) {
       return this.$staticUrl + avatar;
     },
-    getUser(val) {
-      console.log(val);
+
+    read(chat) {
+      chat.new = false;
+    },
+    async getUserByName(name) {
+      if (!name) {
+        return;
+      }
+      try {
+        this.dloading = true;
+        const user = await this.$api.getUserInfo({ name: name });
+        this.searchResult = user;
+      } finally {
+        this.dloading = false;
+      }
+    },
+    async addFriend() {
+      this.dloading = true;
+      this.dloading = false;
+
+      this.addVisible = false;
     },
   },
 };
@@ -192,15 +281,50 @@ export default {
   }
 }
 .friend {
-  padding-left: 10px;
-  font-size: 20px;
+  padding-left: 15px;
+  font-size: 18px;
   color: rgb(84, 92, 100);
   font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
 }
 .add {
   display: flex;
   justify-content: center;
   padding-bottom: 10px;
   border-bottom: solid 1px #eaecf1;
+}
+.search-result {
+  padding-top: 50px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  .item {
+    width: 90%;
+    display: flex;
+    .left {
+      width: 100px;
+      border-right: solid 1px #eaecf1;
+    }
+    .right {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      .result-name {
+        font-size: 18px;
+        color: rgb(84, 92, 100);
+        font-weight: 600;
+        height: 30px;
+        line-height: 30px;
+      }
+      .result-des {
+        height: 60px;
+        line-height: 30px;
+      }
+    }
+  }
 }
 </style>

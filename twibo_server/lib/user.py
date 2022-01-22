@@ -2,6 +2,7 @@ import os.path
 
 from twibo_server.config import config
 from twibo_server.model.user import UserModel
+from twibo_server.model.friend import FriendModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id
 
@@ -28,11 +29,18 @@ class User:
         return getattr(self.model, item)
 
     @classmethod
-    def get_user(cls, user_id):
-        user = UserModel.get(user_id)
-        if not user:
-            raise ParameterError(400, 'User not found')
-        return user.to_json()
+    def get_user(cls, user_id, user_name):
+        if user_id:
+            user = UserModel.get(user_id)
+            if not user:
+                raise ParameterError(400, 'User not found')
+            return user.to_json()
+
+        elif user_name:
+            user = UserModel.get_by_name(user_name)
+            return user and user.to_json()
+        else:
+            raise ParameterError(400, 'User id is required')
 
     @classmethod
     def create(cls, data):
@@ -91,7 +99,12 @@ class User:
 
     def update_info(self, data):
         name = data['name']
+        description = data['description']
         if not UserModel.check_duplicate_name(name, self.user_id):
             raise ParameterError(400, f'User {name} has already existed')
         self.model.name = name
+        self.model.description = description
         self.model.save()
+
+    def get_friends(self):
+        friends = FriendModel.get_friends(self.user_id)

@@ -32,7 +32,8 @@ def logout():
 @login_required
 def get_user_info():
     user_id = request.args.get('user_id')
-    user = User.get_user(user_id)
+    user_name = request.args.get('name')
+    user = User.get_user(user_id, user_name)
     return jsonify(meta={'code': 200}, data=user)
 
 

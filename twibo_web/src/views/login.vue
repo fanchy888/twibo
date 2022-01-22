@@ -38,11 +38,7 @@
             </el-input>
           </el-form-item>
           <div class="btn">
-            <el-button
-              type="primary"
-              @click="login('formData')"
-              native-type="submit"
-              round
+            <el-button type="primary" @click="login('formData')" round
               >Login</el-button
             >
           </div>
@@ -67,7 +63,7 @@ export default {
       timer: "",
       rules: {
         email: [
-          { required: true, message: "Email is required", trigger: "change" },
+          { required: true, message: "Account is required", trigger: "change" },
         ],
         password: [
           {
@@ -96,13 +92,14 @@ export default {
         return;
       }
       const encryptPasswd = this.$getRsaCode(this.formData.password);
-
       const userInfo = await this.$api.login({
         email: this.formData.email,
         password: encryptPasswd,
       });
+
       this.$store.commit("login", userInfo);
-      let redirect = decodeURIComponent(this.$route.query.redirect || "/");
+
+      let redirect = this.$route.query.redirect || "/";
       this.$router.push(redirect);
     },
     register() {
