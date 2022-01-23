@@ -13,6 +13,39 @@ class FriendModel(Base, MixinBase):
     __table_args__ = (UniqueConstraint('user_id', 'friend_user_id', name='_friend_uc'),)
 
     @classmethod
+    def get_friend(cls, user_id, friend_user_id):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).one_or_none()
+
+    @classmethod
+    def check_friendship(cls, user_id, friend_user_id):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).one_or_none()
+
+    @classmethod
     def get_friends(cls, user_id):
         with session_manager() as session:
             return session.query(cls).filter(cls.user_id == user_id).all()
+
+    @classmethod
+    def create_friendship(cls, request, receive):
+        with session_manager() as session:
+            model1 = cls(**request)
+            model2 = cls(**receive)
+            session.add(model1)
+            session.add(model2)
+            session.commit()
+
+
+class FriendRequestModel(Base, MixinBase):
+    __tablename__ = 'FriendRequest'
+
+    request_id = Column(INTEGER, primary_key=True, autoincrement=True)
+    from_user = Column(VARCHAR(32), nullable=False)
+    to_id = Column(VARCHAR(32), nullable=False)
+    active = Column(Boolean, default=True)
+
+    @classmethod
+    def get_one(cls, user_id, friend_user_id):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.from_user == user_id, cls.to_id == friend_user_id).one_or_none()

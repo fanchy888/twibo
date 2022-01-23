@@ -9,6 +9,7 @@ export default new Vuex.Store({
   state: {
     token: null,
     currentUser: null,
+    friendRequests: [],
   },
   mutations: {
     login(state, userInfo) {

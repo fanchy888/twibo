@@ -2,9 +2,10 @@ import os.path
 
 from twibo_server.config import config
 from twibo_server.model.user import UserModel
-from twibo_server.model.friend import FriendModel
+from twibo_server.model.friend import FriendModel, FriendRequestModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id
+from twibo_server import socketIO
 
 
 class User:
@@ -29,18 +30,11 @@ class User:
         return getattr(self.model, item)
 
     @classmethod
-    def get_user(cls, user_id, user_name):
-        if user_id:
-            user = UserModel.get(user_id)
-            if not user:
-                raise ParameterError(400, 'User not found')
-            return user.to_json()
-
-        elif user_name:
-            user = UserModel.get_by_name(user_name)
-            return user and user.to_json()
-        else:
-            raise ParameterError(400, 'User id is required')
+    def get_user(cls, user_id):
+        user = UserModel.get(user_id)
+        if not user:
+            raise ParameterError(400, 'User not found')
+        return user.to_json()
 
     @classmethod
     def create(cls, data):
@@ -71,7 +65,7 @@ class User:
         passwd = rsa_decrypt(passwd)
         user = UserModel.get_by_email(email)
         if not user:
-            raise ParameterError(400, 'User email does not exist')
+            raise ParameterError(400, 'User Account does not exist')
         if not user.check_password(passwd):
             raise ParameterError(400, 'Password incorrect')
 
@@ -107,4 +101,55 @@ class User:
         self.model.save()
 
     def get_friends(self):
-        friends = FriendModel.get_friends(self.user_id)
+        friend_models = FriendModel.get_friends(self.user_id)
+
+        nick_names = {f.user_id: f.nick_name for f in friend_models}
+        friends_list = UserModel.get_users(list(nick_names.keys()))
+        friend_info = []
+        for f in friends_list:
+            res = f.to_json()
+            res['nick_name'] = nick_names[f.user_id]
+            friend_info.append(res)
+        return friend_info
+
+    def search_friend_by_name(self, name):
+        user = UserModel.get_by_name(name)
+        if user:
+            if user.user_id == self.user_id or FriendModel.check_friendship(self.user_id, user.user_id):
+                user = None
+            else:
+                user = user.to_json()
+        return user
+
+    def request_friend(self, friend_user_id):
+        request_model = FriendRequestModel.get_one(self.user_id, friend_user_id)
+        if request_model:
+            request_model.active = True
+        else:
+            data = {
+                'from_user': self.user_id,
+                'to_user': friend_user_id,
+            }
+            request_model = FriendRequestModel()
+        request_model.save()
+        msg = {
+            'receiver': friend_user_id,
+            'sender': self.model.to_json(),
+        }
+        socketIO.emit('requestFriend', msg, namespace='/twibo')
+
+    def confirm_friend(self, user_id):
+        request_model = FriendRequestModel.get_one(user_id, self.user_id)
+        if not request_model:
+            raise ParameterError(400, 'No friendship request found')
+        request_model.active = False
+        request_model.save()
+        from_user = {
+            'user_id': user_id,
+            'friend_user_id': self.user_id
+        }
+        to_user = {
+            'user_id': self.user_id,
+            'friend_user_id': user_id
+        }
+        FriendModel.create_friendship(from_user, to_user)

@@ -59,32 +59,44 @@
               >添加好友</el-button
             >
           </div>
-          <div
-            v-for="(friend, index) in filterdFriends"
-            :key="index.toString()"
-            class="chat-item"
-          >
-            <el-avatar
-              v-if="friend.avatar"
-              :src="avatarSrc(friend.avatar)"
-              :size="40"
-            ></el-avatar>
-            <el-avatar v-else :size="40">
-              <span style="font-size: 30px"><i class="el-icon-user"></i></span>
-            </el-avatar>
-            <div class="friend">
-              <span style="text-overflow: ellipsis; overflow: hidden">{{
-                friend.nick_name || friend.name
-              }}</span>
-              <el-popover placement="right">
-                <el-button
-                  slot="reference"
-                  icon="el-icon-edit"
-                  circle
-                ></el-button>
-              </el-popover>
-            </div>
-          </div>
+          <el-collapse v-model="activeFriend">
+            <el-collapse-item name="request" title="新的朋友">
+              <div
+                v-for="(friend, index) in friendRequests"
+                :key="index.toString()"
+                class="chat-item"
+              ></div>
+            </el-collapse-item>
+            <el-collapse-item name="friend" title="好友">
+              <div
+                v-for="(friend, index) in filterdFriends"
+                :key="index.toString()"
+                class="chat-item"
+              >
+                <el-avatar
+                  v-if="friend.avatar"
+                  :src="avatarSrc(friend.avatar)"
+                  :size="40"
+                ></el-avatar>
+                <el-avatar v-else :size="40">
+                  <span style="font-size: 30px"
+                    ><i class="el-icon-user"></i
+                  ></span>
+                </el-avatar>
+                <div class="friend">
+                  <span style="text-overflow: ellipsis; overflow: hidden">{{
+                    friend.nick_name || friend.name
+                  }}</span>
+                  <el-popover placement="right">
+                    <el-button
+                      slot="reference"
+                      icon="el-icon-edit"
+                      circle
+                    ></el-button>
+                  </el-popover>
+                </div></div
+            ></el-collapse-item>
+          </el-collapse>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -95,15 +107,15 @@
           v-model="searchUserText"
           placeholder="搜一搜"
           @change="getUserByName"
-          maxlength="10"
+          maxlength="50"
         ></el-input>
       </div>
       <div class="search-result" v-loading="dloading">
         <div v-if="searchResult" class="item">
           <div class="left">
             <el-avatar
-              v-if="user.avatar"
-              :src="avatarSrc(user.avatar)"
+              v-if="searchResult.avatar"
+              :src="avatarSrc(searchResult.avatar)"
               :size="80"
             ></el-avatar>
             <el-avatar v-else :size="80">
@@ -112,10 +124,10 @@
           </div>
           <div class="right">
             <div class="result-name">
-              {{ user.name }}
+              {{ searchResult.name }}
             </div>
             <div class="result-des">
-              {{ user.description }}
+              {{ searchResult.description }}
             </div>
             <el-button type="success" size="medium" @click="addFriend"
               >Add</el-button
@@ -134,6 +146,7 @@ export default {
   data() {
     return {
       activeName: "chat",
+      activeFriend: ["request", "friend"],
       chatList: [],
       friendList: [],
       searchInfo: "",
@@ -146,6 +159,7 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.currentUser,
+      friendRequests: (state) => state.friendRequests,
     }),
     filterdFriends() {
       return this.friendList.filter(
@@ -191,6 +205,7 @@ export default {
       time: "19:20",
       nick_name: "nick_1",
     });
+    console.log("=====", this.friendRequests);
   },
   methods: {
     handleClick() {},
@@ -207,7 +222,7 @@ export default {
       }
       try {
         this.dloading = true;
-        const user = await this.$api.getUserInfo({ name: name });
+        const user = await this.$api.getUserByName({ name: name });
         this.searchResult = user;
       } finally {
         this.dloading = false;
@@ -215,9 +230,14 @@ export default {
     },
     async addFriend() {
       this.dloading = true;
-      this.dloading = false;
-
-      this.addVisible = false;
+      try {
+        await this.$api.addFriend({ user_id: this.searchResult.user_id });
+      } finally {
+        this.dloading = false;
+        this.addVisible = false;
+        this.searchUserText = "";
+        this.searchResult = null;
+      }
     },
   },
 };
@@ -293,7 +313,6 @@ export default {
   display: flex;
   justify-content: center;
   padding-bottom: 10px;
-  border-bottom: solid 1px #eaecf1;
 }
 .search-result {
   padding-top: 50px;

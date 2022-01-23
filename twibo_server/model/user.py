@@ -1,6 +1,7 @@
 from sqlalchemy import INTEGER, VARCHAR, Boolean, Column, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 from twibo_server.model.mysql_manager import session_manager, MixinBase, Base
+from twibo_server.model.friend import FriendModel
 
 
 class UserModel(Base, MixinBase):
@@ -53,7 +54,12 @@ class UserModel(Base, MixinBase):
     @classmethod
     def check_duplicate_name(cls, name, user_id):
         with session_manager() as session:
-            return bool(session.query(cls.user_id != user_id, cls.name == name).all())
+            return bool(session.query(cls.name).filter(cls.user_id != user_id, cls.name == name).all())
+
+    @classmethod
+    def get_users(cls, user_ids):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.user_id.in_(user_ids)).all()
 
     def to_json(self):
         data = {

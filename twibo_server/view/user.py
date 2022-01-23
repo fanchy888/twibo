@@ -32,8 +32,7 @@ def logout():
 @login_required
 def get_user_info():
     user_id = request.args.get('user_id')
-    user_name = request.args.get('name')
-    user = User.get_user(user_id, user_name)
+    user = User.get_user(user_id)
     return jsonify(meta={'code': 200}, data=user)
 
 
@@ -56,3 +55,27 @@ def upload():
     User.upload_file(file, data)
     return jsonify(meta={'code': 200}, data={'success': True})
 
+
+@bp.route('/user/friend', methods=['GET'])
+@login_required
+def search_by_name():
+    name = request.args.get('name')
+    user = User(g.user_id).search_friend_by_name(name)
+    return jsonify(meta={'code': 200}, data=user)
+
+
+@bp.route('/user/friend', methods=['POST'])
+@login_required
+def add_friend():
+    data = request.get_json()
+    friend_id = data['user_id']
+    User(g.user_id).request_friend(friend_id)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
+@bp.route('/user/friend/<user_id>', methods=['PATCH'])
+@login_required
+def add_friend(user_id):
+    friend = user_id
+    User(g.user_id).confirm_friend(friend)
+    return jsonify(meta={'code': 200}, data={'success': True})
