@@ -1,7 +1,7 @@
 from sqlalchemy import INTEGER, VARCHAR, Boolean, Column, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 from twibo_server.model.mysql_manager import session_manager, MixinBase, Base
-from twibo_server.model.friend import FriendModel
+from twibo_server.model.friend import FriendModel, FriendRequestModel
 
 
 class UserModel(Base, MixinBase):
@@ -60,6 +60,19 @@ class UserModel(Base, MixinBase):
     def get_users(cls, user_ids):
         with session_manager() as session:
             return session.query(cls).filter(cls.user_id.in_(user_ids)).all()
+
+    @classmethod
+    def get_friends(cls, user_id):
+        with session_manager() as session:
+            return session.query(cls, FriendModel).join(FriendModel, FriendModel.user_id == cls.user_id).filter(
+                FriendModel.user_id == user_id).all()
+
+    @classmethod
+    def get_friend_requests(cls, user_id):
+        with session_manager() as session:
+            return session.query(cls, FriendRequestModel).join(
+                FriendRequestModel, FriendRequestModel.to_id == cls.user_id).filter(
+                FriendRequestModel.to_id == user_id).order_by(FriendRequestModel.create_time.desc()).all()
 
     def to_json(self):
         data = {

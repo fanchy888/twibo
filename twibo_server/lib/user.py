@@ -101,14 +101,12 @@ class User:
         self.model.save()
 
     def get_friends(self):
-        friend_models = FriendModel.get_friends(self.user_id)
+        friend_models = UserModel.get_friends(self.user_id)
 
-        nick_names = {f.user_id: f.nick_name for f in friend_models}
-        friends_list = UserModel.get_users(list(nick_names.keys()))
         friend_info = []
-        for f in friends_list:
-            res = f.to_json()
-            res['nick_name'] = nick_names[f.user_id]
+        for user, friend in friend_models:
+            res = user.to_json()
+            res['nick_name'] = friend.nick_name
             friend_info.append(res)
         return friend_info
 
@@ -130,7 +128,7 @@ class User:
                 'from_user': self.user_id,
                 'to_user': friend_user_id,
             }
-            request_model = FriendRequestModel()
+            request_model = FriendRequestModel(**data)
         request_model.save()
         msg = {
             'receiver': friend_user_id,
@@ -153,3 +151,27 @@ class User:
             'friend_user_id': user_id
         }
         FriendModel.create_friendship(from_user, to_user)
+
+    def reject_friend(self, user_id):
+        request_model = FriendRequestModel.get_one(user_id, self.user_id)
+        if not request_model:
+            return
+        request_model.active = False
+
+    def get_friend_requests(self):
+        res = []
+        for u in UserModel.get_friend_requests(self.user_id):
+            res.append(u.to_json())
+        return res
+
+    def update_friend(self, friend_id, data):
+        nick_name = data['nick_name']
+        friend = FriendModel.get_friend(self.user_id, friend_id)
+        if friend:
+            friend.nick_name = nick_name
+            friend.save()
+        else:
+            raise ParameterError(400, 'Friend not found')
+
+    def delete_friend(self, friend_user_id):
+        FriendModel.delete_friend(self.user_id, friend_user_id)

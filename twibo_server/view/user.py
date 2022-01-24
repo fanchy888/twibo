@@ -56,7 +56,7 @@ def upload():
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/user/friend', methods=['GET'])
+@bp.route('/user/search', methods=['GET'])
 @login_required
 def search_by_name():
     name = request.args.get('name')
@@ -64,18 +64,48 @@ def search_by_name():
     return jsonify(meta={'code': 200}, data=user)
 
 
-@bp.route('/user/friend', methods=['POST'])
+@bp.route('/user/<user_id>/friend', methods=['POST'])
 @login_required
-def add_friend():
+def add_friend(user_id):
     data = request.get_json()
     friend_id = data['user_id']
     User(g.user_id).request_friend(friend_id)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/user/friend/<user_id>', methods=['PATCH'])
+@bp.route('/user/<user_id>/friend', methods=['PATCH'])
 @login_required
-def add_friend(user_id):
+def confirm_friend(user_id):
     friend = user_id
     User(g.user_id).confirm_friend(friend)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
+@bp.route('/user/<user_id>/friends', methods=['GET'])
+@login_required
+def get_friends():
+    friends = User(g.user_id).get_friends()
+    return jsonify(meta={'code': 200}, data=friends)
+
+
+@bp.route('/user/<user_id>/friend-request', methods=['GET'])
+@login_required
+def get_friend_request():
+    req = User(g.user_id).get_friend_requests()
+    return jsonify(meta={'code': 200}, data=req)
+
+
+@bp.route('/user/<user_id>/friend/<friend_user_id>', methods=['PATCH'])
+@login_required
+def update_friend_info(user_id, friend_user_id):
+    data = request.get_json()
+    User(g.user_id).update_friend(friend_user_id, data)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
+@bp.route('/user/<user_id>/friend/<friend_user_id>', methods=['DELETE'])
+@login_required
+def delete_friend(user_id, friend_user_id):
+    data = request.get_json()
+    User(g.user_id).delete_friend(friend_user_id)
     return jsonify(meta={'code': 200}, data={'success': True})

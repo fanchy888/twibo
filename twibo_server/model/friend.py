@@ -23,17 +23,21 @@ class FriendModel(Base, MixinBase):
             return session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).one_or_none()
 
     @classmethod
-    def get_friends(cls, user_id):
-        with session_manager() as session:
-            return session.query(cls).filter(cls.user_id == user_id).all()
-
-    @classmethod
     def create_friendship(cls, request, receive):
         with session_manager() as session:
             model1 = cls(**request)
             model2 = cls(**receive)
             session.add(model1)
             session.add(model2)
+            session.commit()
+
+    @classmethod
+    def delete_friend(cls, user_id, friend_user_id):
+        with session_manager() as session:
+            model1 = session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).one_or_none()
+            model2 = session.query(cls).filter(cls.user_id == friend_user_id, cls.friend_user_id == user_id).one_or_none()
+            session.delete(model1)
+            session.delete(model2)
             session.commit()
 
 
@@ -49,3 +53,8 @@ class FriendRequestModel(Base, MixinBase):
     def get_one(cls, user_id, friend_user_id):
         with session_manager() as session:
             return session.query(cls).filter(cls.from_user == user_id, cls.to_id == friend_user_id).one_or_none()
+
+    @classmethod
+    def get_all(cls, user_id):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.to_id == user_id).order_by(cls.create_time.desc()).all()

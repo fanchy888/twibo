@@ -172,7 +172,7 @@ export default {
       return this.chatList.filter((f) => f.name.includes(this.searchInfo));
     },
   },
-  mounted() {
+  async mounted() {
     this.chatList.push({
       avatar: "avatar.jpg",
       name: "test",
@@ -205,7 +205,9 @@ export default {
       time: "19:20",
       nick_name: "nick_1",
     });
-    console.log("=====", this.friendRequests);
+    // console.log("=====", this.friendRequests);
+    const res = await this.$api.getFriends();
+    console.log("============", res);
   },
   methods: {
     handleClick() {},
