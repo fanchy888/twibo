@@ -64,14 +64,14 @@ class UserModel(Base, MixinBase):
     @classmethod
     def get_friends(cls, user_id):
         with session_manager() as session:
-            return session.query(cls, FriendModel).join(FriendModel, FriendModel.user_id == cls.user_id).filter(
+            return session.query(cls, FriendModel).join(cls, FriendModel.friend_user_id == cls.user_id).filter(
                 FriendModel.user_id == user_id).all()
 
     @classmethod
     def get_friend_requests(cls, user_id):
         with session_manager() as session:
-            return session.query(cls, FriendRequestModel).join(
-                FriendRequestModel, FriendRequestModel.to_id == cls.user_id).filter(
+            return session.query(cls).join(
+                FriendRequestModel, FriendRequestModel.from_user == cls.user_id).filter(
                 FriendRequestModel.to_id == user_id).order_by(FriendRequestModel.create_time.desc()).all()
 
     def to_json(self):

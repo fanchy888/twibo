@@ -83,14 +83,14 @@ def confirm_friend(user_id):
 
 @bp.route('/user/<user_id>/friends', methods=['GET'])
 @login_required
-def get_friends():
+def get_friends(user_id):
     friends = User(g.user_id).get_friends()
     return jsonify(meta={'code': 200}, data=friends)
 
 
 @bp.route('/user/<user_id>/friend-request', methods=['GET'])
 @login_required
-def get_friend_request():
+def get_friend_request(user_id):
     req = User(g.user_id).get_friend_requests()
     return jsonify(meta={'code': 200}, data=req)
 

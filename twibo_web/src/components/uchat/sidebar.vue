@@ -206,7 +206,9 @@ export default {
       nick_name: "nick_1",
     });
     // console.log("=====", this.friendRequests);
-    const res = await this.$api.getFriends();
+    const res = await this.$api.getFriends({
+      user_id: this.user.user_id,
+    });
     console.log("============", res);
   },
   methods: {
