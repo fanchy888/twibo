@@ -67,17 +67,23 @@ def search_by_name():
 @bp.route('/user/<user_id>/friend', methods=['POST'])
 @login_required
 def add_friend(user_id):
-    data = request.get_json()
-    friend_id = data['user_id']
-    User(g.user_id).request_friend(friend_id)
+    User(g.user_id).request_friend(user_id)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/user/<user_id>/friend', methods=['PATCH'])
+@bp.route('/user/<user_id>/friend/confirm', methods=['PATCH'])
 @login_required
 def confirm_friend(user_id):
-    friend = user_id
+    friend = request.args.get('friend_id')
     User(g.user_id).confirm_friend(friend)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
+@bp.route('/user/<user_id>/friend/reject', methods=['PATCH'])
+@login_required
+def reject_friend(user_id):
+    friend = request.args.get('friend_id')
+    User(g.user_id).reject_friend(friend)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 

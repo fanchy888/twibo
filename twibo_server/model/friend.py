@@ -46,15 +46,15 @@ class FriendRequestModel(Base, MixinBase):
 
     request_id = Column(INTEGER, primary_key=True, autoincrement=True)
     from_user = Column(VARCHAR(32), nullable=False)
-    to_id = Column(VARCHAR(32), nullable=False)
+    to_user = Column(VARCHAR(32), nullable=False)
     active = Column(Boolean, default=True)
 
     @classmethod
     def get_one(cls, user_id, friend_user_id):
         with session_manager() as session:
-            return session.query(cls).filter(cls.from_user == user_id, cls.to_id == friend_user_id).one_or_none()
+            return session.query(cls).filter(cls.from_user == user_id, cls.to_user == friend_user_id).one_or_none()
 
     @classmethod
     def get_all(cls, user_id):
         with session_manager() as session:
-            return session.query(cls).filter(cls.to_id == user_id).order_by(cls.create_time.desc()).all()
+            return session.query(cls).filter(cls.to_user == user_id).order_by(cls.create_time.desc()).all()

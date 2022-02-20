@@ -53,7 +53,7 @@
         <span slot="label" style="font-size: 20px"
           ><i class="el-icon-user-solid"></i
         ></span>
-        <div class="chat">
+        <div class="chat" v-loading="loading">
           <div class="add">
             <el-button icon="el-icon-plus" @click="addVisible = true"
               >添加好友</el-button
@@ -61,11 +61,53 @@
           </div>
           <el-collapse v-model="activeFriend">
             <el-collapse-item name="request" title="新的朋友">
+              <template slot="title"
+                >新的朋友
+                <el-badge
+                  :value="friendRequests.length"
+                  :max="99"
+                  :hidden="!friendRequests.length"
+                ></el-badge>
+              </template>
               <div
                 v-for="(friend, index) in friendRequests"
                 :key="index.toString()"
-                class="chat-item"
-              ></div>
+                class="request-item"
+              >
+                <div class="info">
+                  <el-avatar
+                    v-if="friend.avatar"
+                    :src="avatarSrc(friend.avatar)"
+                    :size="40"
+                  ></el-avatar>
+                  <el-avatar v-else :size="40">
+                    <span style="font-size: 30px"
+                      ><i class="el-icon-user"></i
+                    ></span>
+                  </el-avatar>
+                  <div class="friend">
+                    <span style="text-overflow: ellipsis; overflow: hidden">{{
+                      friend.name
+                    }}</span>
+                  </div>
+                </div>
+                <div>
+                  <el-button
+                    type="success"
+                    size="mini"
+                    plain
+                    @click="confirmFriend(friend)"
+                    >接受</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    size="mini"
+                    plain
+                    @click="rejectFriend(friend)"
+                    >拒绝</el-button
+                  >
+                </div>
+              </div>
             </el-collapse-item>
             <el-collapse-item name="friend" title="好友">
               <div
@@ -140,26 +182,27 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 export default {
   name: "sideBar",
   data() {
     return {
       activeName: "chat",
-      activeFriend: ["request", "friend"],
+      activeFriend: ["friend"],
       chatList: [],
-      friendList: [],
       searchInfo: "",
       addVisible: false,
       searchUserText: "",
       searchResult: null,
       dloading: false,
+      loading: false,
     };
   },
   computed: {
     ...mapState({
       user: (state) => state.currentUser,
-      friendRequests: (state) => state.friendRequests,
+      friendRequests: (state) => state.Friend.friendRequests,
+      friendList: (state) => state.Friend.friendList,
     }),
     filterdFriends() {
       return this.friendList.filter(
@@ -188,30 +231,14 @@ export default {
       time: "",
     });
 
-    this.friendList = [
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-      ...this.chatList,
-    ];
-    this.friendList.unshift({
-      avatar: "avatar.jpg",
-      name: "gggggggggggggggggggggggggggggggggggggggggg",
-      lastMsg: "nihaoaaaaaaaaaaaaaaaaaaaaaaa",
-      time: "19:20",
-      nick_name: "nick_1",
-    });
-    // console.log("=====", this.friendRequests);
-    const res = await this.$api.getFriends({
-      user_id: this.user.user_id,
-    });
-    console.log("============", res);
+    if (!this.user) {
+      await this.getUserInfo();
+    }
+    await this.getFriendRequests();
+    await this.getFriends();
   },
   methods: {
+    ...mapActions(["getUserInfo", "getFriendRequests", "getFriends"]),
     handleClick() {},
     avatarSrc(avatar) {
       return this.$staticUrl + avatar;
@@ -243,6 +270,37 @@ export default {
         this.searchResult = null;
       }
     },
+
+    async confirmFriend(friend) {
+      this.loading = true;
+      try {
+        const params = {
+          user_id: this.user.user_id,
+          $query: {
+            friend_id: friend.user_id,
+          },
+        };
+        await this.$api.confirmFriend(params);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async rejectFriend(friend) {
+      this.loading = true;
+      try {
+        const params = {
+          user_id: this.user.user_id,
+          $query: {
+            friend_id: friend.user_id,
+          },
+        };
+        await this.$api.rejectFriend(params);
+        this.$store.dispatch("removeFriendRequest", friend.user_id);
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
@@ -257,9 +315,25 @@ export default {
   line-height: 50px;
   margin: auto;
 }
+
 .chat {
   height: 450px;
   overflow-y: auto;
+}
+.request-item {
+  width: auto;
+  height: 100px;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border-bottom: solid 1px #eaecf1;
+  .info {
+    display: flex;
+  }
+}
+.request-item:hover {
+  background: #ececea;
 }
 .chat-item {
   width: auto;

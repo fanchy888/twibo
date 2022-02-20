@@ -49,7 +49,13 @@ export default [
     name: "confirmFriend",
     method: "PATCH",
     desc: "接受好友请求",
-    path: "/api/user/:user_id/friend",
+    path: "/api/user/:user_id/friend/confirm",
+  },
+  {
+    name: "rejectFriend",
+    method: "PATCH",
+    desc: "接受好友请求",
+    path: "/api/user/:user_id/friend/reject",
   },
   {
     name: "getFriends",

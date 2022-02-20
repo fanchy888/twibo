@@ -2,14 +2,14 @@ import Vue from "vue";
 import Vuex from "vuex";
 import api from "@/plugins/api";
 import Socket from "./socket";
+import Friend from "./friend";
 import { currentUser } from "@/utils/user";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     token: null,
-    currentUser: null,
-    friendRequests: [],
+    currentUser: currentUser(),
   },
   mutations: {
     login(state, userInfo) {
@@ -41,5 +41,5 @@ export default new Vuex.Store({
       }
     },
   },
-  modules: { Socket },
+  modules: { Socket, Friend },
 });

@@ -94,7 +94,7 @@ class User:
     def update_info(self, data):
         name = data['name']
         description = data['description']
-        if not UserModel.check_duplicate_name(name, self.user_id):
+        if UserModel.check_duplicate_name(name, self.user_id):
             raise ParameterError(400, f'User {name} has already existed')
         self.model.name = name
         self.model.description = description
@@ -106,8 +106,9 @@ class User:
         friend_info = []
         for user, friend in friend_models:
             res = user.to_json()
-            res['nick_name'] = friend.nick_name
+            res['nick_name'] = friend.nick_name or user.name
             friend_info.append(res)
+        friend_info.sort(key=lambda x: x['nick_name'].lower())
         return friend_info
 
     def search_friend_by_name(self, name):
@@ -138,10 +139,16 @@ class User:
 
     def confirm_friend(self, user_id):
         request_model = FriendRequestModel.get_one(user_id, self.user_id)
-        if not request_model:
-            raise ParameterError(400, 'No friendship request found')
-        request_model.active = False
-        request_model.save()
+        if request_model:
+            request_model.active = False
+            request_model.save()
+        else:
+            raise ParameterError(400, 'Request not found')
+        request_model = FriendRequestModel.get_one(self.user_id, user_id)
+        if request_model:
+            request_model.active = False
+            request_model.save()
+
         from_user = {
             'user_id': user_id,
             'friend_user_id': self.user_id
@@ -151,12 +158,24 @@ class User:
             'friend_user_id': user_id
         }
         FriendModel.create_friendship(from_user, to_user)
+        self.send_msg(user_id, 'hi~')
+
+        socketIO.emit('clearRequest', [self.user_id, user_id], namespace='/twibo')
+
+    def send_msg(self, to_user_id, msg):
+        msg = {
+            'sender': self.user_id,
+            'receiver': to_user_id,
+            'msg': msg
+        }
+        socketIO.emit('sendMsg', msg, namespace='/twibo')
 
     def reject_friend(self, user_id):
         request_model = FriendRequestModel.get_one(user_id, self.user_id)
         if not request_model:
             return
         request_model.active = False
+        request_model.save()
 
     def get_friend_requests(self):
         res = []

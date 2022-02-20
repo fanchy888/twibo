@@ -72,7 +72,8 @@ class UserModel(Base, MixinBase):
         with session_manager() as session:
             return session.query(cls).join(
                 FriendRequestModel, FriendRequestModel.from_user == cls.user_id).filter(
-                FriendRequestModel.to_id == user_id).order_by(FriendRequestModel.create_time.desc()).all()
+                FriendRequestModel.to_user == user_id, FriendRequestModel.active.is_(True)).order_by(
+                FriendRequestModel.create_time.desc()).all()
 
     def to_json(self):
         data = {
