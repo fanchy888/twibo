@@ -107,6 +107,7 @@ class User:
         for user, friend in friend_models:
             res = user.to_json()
             res['nick_name'] = friend.nick_name or user.name
+            res['friend_id'] = friend.friend_id
             friend_info.append(res)
         friend_info.sort(key=lambda x: x['nick_name'].lower())
         return friend_info

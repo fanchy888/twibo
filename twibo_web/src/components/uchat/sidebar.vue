@@ -15,7 +15,8 @@
     >
       <el-tab-pane name="chat">
         <span slot="label" style="font-size: 20px"
-          ><i class="el-icon-chat-line-round"></i
+          ><el-badge is-dot :hidden="!unreadChat" style="line-height: 15px">
+            <i class="el-icon-chat-line-round"></i></el-badge
         ></span>
         <div class="chat">
           <div
@@ -51,7 +52,11 @@
       </el-tab-pane>
       <el-tab-pane name="friend">
         <span slot="label" style="font-size: 20px"
-          ><i class="el-icon-user-solid"></i
+          ><el-badge
+            is-dot
+            :hidden="!friendRequests.length"
+            style="line-height: 15px"
+            ><i class="el-icon-user-solid"></i></el-badge
         ></span>
         <div class="chat" v-loading="loading">
           <div class="add">
@@ -129,11 +134,74 @@
                   <span style="text-overflow: ellipsis; overflow: hidden">{{
                     friend.nick_name || friend.name
                   }}</span>
-                  <el-popover placement="right">
+                  <el-popover
+                    placement="right"
+                    width="350"
+                    :ref="`popRef${index}`"
+                  >
+                    <div class="pop-info" v-loading="editLoading">
+                      <el-avatar
+                        v-if="friend.avatar"
+                        :src="avatarSrc(friend.avatar)"
+                        :size="50"
+                      ></el-avatar>
+                      <el-avatar v-else :size="50">
+                        <span style="font-size: 40px"
+                          ><i class="el-icon-user"></i
+                        ></span>
+                      </el-avatar>
+                      <div
+                        style="
+                          padding-top: 10px;
+                          color: #a6a6a8;
+                          font-size: 10px;
+                        "
+                      >
+                        {{ friend.description }}
+                      </div>
+                      <div style="padding-top: 10px">
+                        {{ friend.name }}
+                      </div>
+                      <div style="padding-top: 10px">
+                        备注：<el-input
+                          size="small"
+                          style="width: 100px"
+                          v-model="friend.nick_name"
+                          :disabled="!editName"
+                          @blur="editFriend(friend)"
+                        ></el-input
+                        ><el-button
+                          type=""
+                          icon="el-icon-edit"
+                          circle
+                          size="mini"
+                          @click="editName = true"
+                          style="margin-left: 5px"
+                        ></el-button>
+                      </div>
+                      <div style="padding-top: 50px">
+                        <el-button
+                          type="success"
+                          size="small"
+                          icon="el-icon-chat-dot-round"
+                          @click="jumpToChat(friend, index)"
+                          >发消息</el-button
+                        >
+                        <el-button
+                          type="danger"
+                          size="small"
+                          icon="el-icon-delete"
+                          @click="clickDelete(friend)"
+                          >删除</el-button
+                        >
+                      </div>
+                    </div>
+
                     <el-button
                       slot="reference"
-                      icon="el-icon-edit"
+                      icon="el-icon-more"
                       circle
+                      size="mini"
                     ></el-button>
                   </el-popover>
                 </div></div
@@ -196,6 +264,8 @@ export default {
       searchResult: null,
       dloading: false,
       loading: false,
+      editLoading: false,
+      editName: false,
     };
   },
   computed: {
@@ -213,6 +283,9 @@ export default {
     },
     filterdChatList() {
       return this.chatList.filter((f) => f.name.includes(this.searchInfo));
+    },
+    unreadChat() {
+      return this.chatList.filter((f) => f.new).length;
     },
   },
   async mounted() {
@@ -301,6 +374,49 @@ export default {
         this.loading = false;
       }
     },
+    async editFriend(friend) {
+      this.editLoading = true;
+      try {
+        const params = {
+          user_id: this.user.user_id,
+          friend_user_id: friend.user_id,
+          $body: friend,
+        };
+        await this.$api.updateFriend(params);
+      } finally {
+        this.editLoading = false;
+        this.editName = false;
+      }
+    },
+    jumpToChat(friend, index) {
+      this.activeName = "chat";
+      this.$refs["popRef" + index][0].doClose();
+    },
+
+    async clickDelete(friend) {
+      const res = await this.$confirm("此操作将永久删除该好友, 是否继续?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).catch(() => {});
+      if (res) {
+        await this.deleteFriend(friend);
+      }
+    },
+
+    async deleteFriend(friend) {
+      this.editLoading = true;
+      try {
+        const param = {
+          user_id: this.user.user_id,
+          friend_user_id: friend.user_id,
+        };
+        await this.$api.deleteFriend(param);
+        await this.getFriends();
+      } finally {
+        this.editLoading = false;
+      }
+    },
   },
 };
 </script>
@@ -386,6 +502,12 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 200px;
+}
+.pop-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
 }
 .add {
   display: flex;

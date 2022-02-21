@@ -73,12 +73,12 @@ export default [
     name: "updateFriend",
     method: "PATCH",
     desc: "更新好友信息",
-    path: "/user/:user_id/friend/:friend_user_id",
+    path: "/api/user/:user_id/friend/:friend_user_id",
   },
   {
     name: "deleteFriend",
     method: "DELETE",
     desc: "删除好友",
-    path: "/user/:user_id/friend/:friend_user_id",
+    path: "/api/user/:user_id/friend/:friend_user_id",
   },
 ];

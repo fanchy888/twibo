@@ -44,6 +44,7 @@
           v-model="userForm.description"
           maxlength="50"
           show-word-limit
+          autosize
           @change="userForm.description = userForm.description.trim()"
           type="textarea"
         ></el-input>
