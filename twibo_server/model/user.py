@@ -64,7 +64,7 @@ class UserModel(Base, MixinBase):
     @classmethod
     def get_friends(cls, user_id):
         with session_manager() as session:
-            return session.query(cls, FriendModel).join(cls, FriendModel.friend_user_id == cls.user_id).filter(
+            return session.query(cls, FriendModel).join(FriendModel, FriendModel.friend_user_id == cls.user_id).filter(
                 FriendModel.user_id == user_id).all()
 
     @classmethod

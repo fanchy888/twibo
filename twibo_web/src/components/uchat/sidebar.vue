@@ -23,7 +23,7 @@
             v-for="(chat, index) in filterdChatList"
             :key="index.toString()"
             class="chat-item"
-            @click="read(chat)"
+            @click="joinChat(chat)"
           >
             <el-badge is-dot style="height: 40px" :hidden="!chat.new">
               <el-avatar
@@ -317,8 +317,9 @@ export default {
       return this.$staticUrl + avatar;
     },
 
-    read(chat) {
+    joinChat(chat) {
       chat.new = false;
+      this.$emit("joinChat", chat);
     },
     async getUserByName(name) {
       if (!name) {
