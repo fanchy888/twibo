@@ -3,37 +3,63 @@
     <div class="chat-header">
       <span class="title">{{ chatInfo.name }}</span>
     </div>
-    <div class="chat-content">
-      <messageList></messageList>
+    <div class="chat-content" id="content">
+      <messageList ref="messageList"></messageList>
     </div>
     <div class="chat-input">
       <el-input
         type="textarea"
         :rows="5"
-        placeholder="说点什么吧"
+        placeholder="Say something..."
         v-model="message"
         @keydown.enter.native="pressEnter($event)"
         :autofocus="true"
+        resize="none"
       >
       </el-input>
       <div class="btn">
-        <el-button type="success" size="medium">发送</el-button>
+        <el-button
+          :disabled="!message"
+          type="success"
+          size="medium"
+          @click="send"
+          >Send</el-button
+        >
       </div>
     </div>
   </el-card>
 </template>
 <script>
 import messageList from "./message-list";
+import { mapActions, mapState } from "vuex";
+
 export default {
   name: "charRoom",
   components: { messageList },
   props: ["chatInfo"],
+  watch: {
+    chatInfo() {
+      this.$refs.messageList.scrollToBottom();
+    },
+  },
   data() {
     return {
       message: "",
     };
   },
+  computed: {
+    ...mapState({
+      user: (state) => state.currentUser,
+    }),
+  },
+  mounted() {
+    document.addEventListener("click", this.onClick);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.onClick);
+  },
   methods: {
+    ...mapActions(["updateLastRead"]),
     pressEnter(e) {
       e.preventDefault();
       if (e.shiftKey || e.ctrlKey) {
@@ -43,7 +69,27 @@ export default {
       }
     },
     send() {
+      const msg = {
+        content: this.message,
+        chat_id: this.chatInfo.chat_id,
+        sender: this.user.user_id,
+      };
+      this.updateLastRead();
+      this.$socket.emit("joinChat", {
+        user_id: this.user.user_id,
+        chat_id: msg.chat_id,
+      });
+      this.$socket.emit("chat", msg);
       this.message = "";
+    },
+    onClick(e) {
+      if (document.getElementById("content").contains(e.target)) {
+        this.updateLastRead();
+        this.$socket.emit("joinChat", {
+          user_id: this.user.user_id,
+          chat_id: this.chatInfo.chat_id,
+        });
+      }
     },
   },
 };

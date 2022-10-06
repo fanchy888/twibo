@@ -41,7 +41,7 @@ export default {
         }
       }
     },
-    async SOCKET_clearRequest({ rootState, dispatch }, userList) {
+    SOCKET_clearRequest({ rootState, dispatch }, userList) {
       const user = rootState.currentUser;
       if (user.user_id === userList[0]) {
         let friend_id = userList[1];
@@ -50,9 +50,6 @@ export default {
         let friend_id = userList[0];
         dispatch("removeFriendRequest", friend_id);
       }
-    },
-    SOCKET_sendMsg({ state }, data) {
-      console.log("sendmsg", data, state.chatList);
     },
   },
   getters: {},

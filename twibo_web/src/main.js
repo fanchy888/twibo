@@ -28,7 +28,7 @@ Vue.use(inject);
 Vue.use(
   new VueSocketio({
     debug: true,
-    connection: socketIO("http://localhost:5000/twibo", {
+    connection: socketIO("http://192.168.5.2:5000/twibo", {
       transports: ["websocket"],
       autoConnect: false,
       reconnection: true,

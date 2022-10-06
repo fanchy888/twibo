@@ -53,3 +53,7 @@ class MixinBase:
             session.add(self)
             session.commit()
 
+    def delete(self):
+        with session_manager() as session:
+            session.delete(self)
+            session.commit()

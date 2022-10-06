@@ -1,4 +1,4 @@
-from twibo_server.model.friend import Base
+from twibo_server.model.chat import Base
 from sqlalchemy import create_engine
 from twibo_server.config import config
 

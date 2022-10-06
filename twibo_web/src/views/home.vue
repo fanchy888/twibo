@@ -81,9 +81,6 @@ export default {
     if (!this.$store.state.Socket.isConnected) {
       this.$socket.open();
     }
-    this.sockets.subscribe("message", (data) => {
-      console.log(data);
-    });
     if (!this.user) {
       this.getUserInfo();
     }

@@ -4,7 +4,7 @@
       <el-input
         prefix-icon="el-icon-search"
         v-model="searchInfo"
-        placeholder="搜索"
+        placeholder="search"
       ></el-input>
     </div>
     <el-tabs
@@ -25,7 +25,7 @@
             class="chat-item"
             @click="joinChat(chat)"
           >
-            <el-badge is-dot style="height: 40px" :hidden="!chat.new">
+            <el-badge is-dot style="height: 40px" :hidden="!checkUnread(chat)">
               <el-avatar
                 v-if="chat.avatar"
                 :src="avatarSrc(chat.avatar)"
@@ -43,8 +43,8 @@
                 <div class="name">{{ chat.name }}</div>
               </div>
               <div class="chat-item-msg">
-                <div class="msg">{{ chat.lastMsg }}</div>
-                <div class="time">{{ chat.time }}</div>
+                <div class="msg">{{ getLastMsg(chat.messages) }}</div>
+                <div class="time">{{ convertTime(chat.time) }}</div>
               </div>
             </div>
           </div>
@@ -61,13 +61,13 @@
         <div class="chat" v-loading="loading">
           <div class="add">
             <el-button icon="el-icon-plus" @click="addVisible = true"
-              >添加好友</el-button
+              >Add</el-button
             >
           </div>
           <el-collapse v-model="activeFriend">
-            <el-collapse-item name="request" title="新的朋友">
+            <el-collapse-item name="request" title="New Request">
               <template slot="title"
-                >新的朋友
+                >New Request
                 <el-badge
                   :value="friendRequests.length"
                   :max="99"
@@ -102,19 +102,19 @@
                     size="mini"
                     plain
                     @click="confirmFriend(friend)"
-                    >接受</el-button
+                    >Accept</el-button
                   >
                   <el-button
                     type="danger"
                     size="mini"
                     plain
                     @click="rejectFriend(friend)"
-                    >拒绝</el-button
+                    >Refuse</el-button
                   >
                 </div>
               </div>
             </el-collapse-item>
-            <el-collapse-item name="friend" title="好友">
+            <el-collapse-item name="friend" title="Friends">
               <div
                 v-for="(friend, index) in filterdFriends"
                 :key="index.toString()"
@@ -163,7 +163,8 @@
                         {{ friend.name }}
                       </div>
                       <div style="padding-top: 10px">
-                        备注：<el-input
+                        alias:
+                        <el-input
                           size="small"
                           style="width: 100px"
                           v-model="friend.nick_name"
@@ -185,14 +186,14 @@
                           size="small"
                           icon="el-icon-chat-dot-round"
                           @click="jumpToChat(friend, index)"
-                          >发消息</el-button
+                          >Chat</el-button
                         >
                         <el-button
                           type="danger"
                           size="small"
                           icon="el-icon-delete"
                           @click="clickDelete(friend)"
-                          >删除</el-button
+                          >Delete</el-button
                         >
                       </div>
                     </div>
@@ -215,7 +216,7 @@
         <el-input
           prefix-icon="el-icon-search"
           v-model="searchUserText"
-          placeholder="搜一搜"
+          placeholder="search"
           @change="getUserByName"
           maxlength="50"
         ></el-input>
@@ -244,20 +245,22 @@
             >
           </div>
         </div>
-        <div v-else>无结果</div>
+        <div v-else>No Result</div>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
+import { timedelta, avatarSrc } from "@/utils/common";
+
 export default {
   name: "sideBar",
+  props: ["friendList", "chatList", "friendRequests"],
   data() {
     return {
       activeName: "chat",
       activeFriend: ["friend"],
-      chatList: [],
       searchInfo: "",
       addVisible: false,
       searchUserText: "",
@@ -271,8 +274,6 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.currentUser,
-      friendRequests: (state) => state.Friend.friendRequests,
-      friendList: (state) => state.Friend.friendList,
     }),
     filterdFriends() {
       return this.friendList.filter(
@@ -285,41 +286,29 @@ export default {
       return this.chatList.filter((f) => f.name.includes(this.searchInfo));
     },
     unreadChat() {
-      return this.chatList.filter((f) => f.new).length;
+      return this.chatList.filter((f) => this.checkUnread(f)).length;
     },
   },
-  async mounted() {
-    this.chatList.push({
-      avatar: "avatar.jpg",
-      name: "test",
-      lastMsg: "nihaoaaaaaaaaaaaaaaaaaaaaaaa",
-      time: "19:20",
-      nick_name: "nick_1",
-      new: true,
-    });
-    this.chatList.push({
-      avatar: "",
-      name: "test2",
-      lastMsg: "",
-      time: "",
-    });
 
-    if (!this.user) {
-      await this.getUserInfo();
-    }
-    await this.getFriendRequests();
-    await this.getFriends();
-  },
   methods: {
-    ...mapActions(["getUserInfo", "getFriendRequests", "getFriends"]),
+    ...mapActions([
+      "getUserInfo",
+      "getChatList",
+      "getFriends",
+      "changeChatRoom",
+    ]),
+    avatarSrc: avatarSrc,
     handleClick() {},
-    avatarSrc(avatar) {
-      return this.$staticUrl + avatar;
-    },
+    // avatarSrc(avatar) {
+    //   return this.$staticUrl + avatar;
+    // },
 
     joinChat(chat) {
-      chat.new = false;
-      this.$emit("joinChat", chat);
+      this.changeChatRoom(chat);
+      this.$socket.emit("joinChat", {
+        user_id: this.user.user_id,
+        chat_id: chat.chat_id,
+      });
     },
     async getUserByName(name) {
       if (!name) {
@@ -384,6 +373,7 @@ export default {
           $body: friend,
         };
         await this.$api.updateFriend(params);
+        await this.getChatList();
       } finally {
         this.editLoading = false;
         this.editName = false;
@@ -392,12 +382,16 @@ export default {
     jumpToChat(friend, index) {
       this.activeName = "chat";
       this.$refs["popRef" + index][0].doClose();
+      const chat = this.chatList.find((c) => c.user_id === friend.user_id);
+      if (chat) {
+        this.joinChat(chat);
+      }
     },
 
     async clickDelete(friend) {
-      const res = await this.$confirm("此操作将永久删除该好友, 是否继续?", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+      const res = await this.$confirm("Are you fucking sure?", {
+        confirmButtonText: "FUCK YOU",
+        cancelButtonText: "Just kidding",
         type: "warning",
       }).catch(() => {});
       if (res) {
@@ -414,9 +408,35 @@ export default {
         };
         await this.$api.deleteFriend(param);
         await this.getFriends();
+        await this.getChatList();
       } finally {
         this.editLoading = false;
       }
+    },
+
+    convertTime(t) {
+      if (!t) return "";
+      const time = new Date(t * 1000 - timedelta);
+      const year = time.getFullYear();
+      const month = time.getMonth() + 1;
+      const day = time.getDate();
+      const hour = time.getHours();
+      const minite = time.getMinutes();
+      return year + "-" + month + "-" + day + " " + hour + ":" + minite;
+    },
+
+    getLastMsg(messages) {
+      if (messages && messages.length > 0) {
+        return messages[messages.length - 1].content;
+      } else {
+        return "";
+      }
+    },
+
+    checkUnread(chat) {
+      return (chat.messages || []).find(
+        (m) => m.time >= chat.last_read && m.sender !== this.user.user_id
+      );
     },
   },
 };
@@ -447,6 +467,8 @@ export default {
   border-bottom: solid 1px #eaecf1;
   .info {
     display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 }
 .request-item:hover {
@@ -493,6 +515,7 @@ export default {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    text-align: left;
   }
 }
 .friend {

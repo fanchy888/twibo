@@ -3,6 +3,7 @@ import os.path
 from twibo_server.config import config
 from twibo_server.model.user import UserModel
 from twibo_server.model.friend import FriendModel, FriendRequestModel
+from twibo_server.lib.uchat import ChatRoom, Message
 from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id
 from twibo_server import socketIO
@@ -158,18 +159,14 @@ class User:
             'user_id': self.user_id,
             'friend_user_id': user_id
         }
-        FriendModel.create_friendship(from_user, to_user)
-        self.send_msg(user_id, 'hi~')
+        if not FriendModel.check_friendship(self.user_id, user_id):
+            FriendModel.create_friendship(from_user, to_user)
 
+        chat_id = ChatRoom.create([self.user_id, user_id])
+
+        self.say_hi(chat_id)
         socketIO.emit('clearRequest', [self.user_id, user_id], namespace='/twibo')
-
-    def send_msg(self, to_user_id, msg):
-        msg = {
-            'sender': self.user_id,
-            'receiver': to_user_id,
-            'msg': msg
-        }
-        socketIO.emit('sendMsg', msg, namespace='/twibo')
+        socketIO.emit('createChat', [self.user_id, user_id], namespace='/twibo')
 
     def reject_friend(self, user_id):
         request_model = FriendRequestModel.get_one(user_id, self.user_id)
@@ -195,3 +192,16 @@ class User:
 
     def delete_friend(self, friend_user_id):
         FriendModel.delete_friend(self.user_id, friend_user_id)
+        ChatRoom.delete_chat([self.user_id, friend_user_id])
+
+    def say_hi(self, chat_id):
+        msg = {
+            'sender': self.user_id,
+            'chat_id': chat_id,
+            'content': 'hi~'
+        }
+        Message.create(msg, False)
+
+    def send_msg(self, msg):
+        Message.create(msg)
+        ChatRoom(msg['chat_id']).join_user(self.user_id)

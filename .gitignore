@@ -5,3 +5,4 @@ twibo_venv/
 *.yaml
 *.rsa
 static/
+twibo_server/dist/

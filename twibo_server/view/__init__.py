@@ -30,3 +30,4 @@ def login_required(func):
 
 from . import user
 from . import socket
+from . import uchat

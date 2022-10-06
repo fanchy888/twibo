@@ -34,10 +34,8 @@ class FriendModel(Base, MixinBase):
     @classmethod
     def delete_friend(cls, user_id, friend_user_id):
         with session_manager() as session:
-            model1 = session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).one_or_none()
-            model2 = session.query(cls).filter(cls.user_id == friend_user_id, cls.friend_user_id == user_id).one_or_none()
-            session.delete(model1)
-            session.delete(model2)
+            session.query(cls).filter(cls.user_id == user_id, cls.friend_user_id == friend_user_id).delete()
+            session.query(cls).filter(cls.user_id == friend_user_id, cls.friend_user_id == user_id).delete()
             session.commit()
 
 

@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import api from "@/plugins/api";
 import Socket from "./socket";
 import Friend from "./friend";
+import Chat from "./chat";
 import { currentUser } from "@/utils/user";
 Vue.use(Vuex);
 
@@ -23,6 +24,11 @@ export default new Vuex.Store({
       state.currentUser = null;
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("userInfo");
+      state.Friend.friendList = [];
+      state.Friend.friendRequests = [];
+      state.Chat.chatList = [];
+      state.Chat.messages = {};
+      state.Chat.currentChat = {};
     },
     SET_STATE(state, obj) {
       Object.keys(obj).forEach((k) => (state[k] = obj[k]));
@@ -41,5 +47,5 @@ export default new Vuex.Store({
       }
     },
   },
-  modules: { Socket, Friend },
+  modules: { Socket, Friend, Chat },
 });
