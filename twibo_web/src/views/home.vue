@@ -44,9 +44,9 @@
             </el-menu-item>
             <el-menu-item index="uchat">
               <i class="el-icon-s-comment"></i>
-              <span slot="title">uChat</span>
+              <span slot="title">μChat</span>
             </el-menu-item>
-            <el-menu-item index="">
+            <el-menu-item index="notes">
               <i class="el-icon-edit"></i>
               <span slot="title">Notes</span>
             </el-menu-item>
@@ -77,23 +77,27 @@ export default {
       return this.user ? this.$staticUrl + this.user.avatar : "";
     },
   },
-  mounted() {
+  async mounted() {
     if (!this.$store.state.Socket.isConnected) {
       this.$socket.open();
     }
     if (!this.user) {
-      this.getUserInfo();
+      await this.getUserInfo();
     }
+    await this.getFriendRequests();
+    await this.getFriends();
+    await this.getChatList();
     this.active = this.$route.name;
   },
+
   methods: {
-    ...mapActions(["getUserInfo"]),
-    sendMessage(data) {
-      this.$socket.emit("message", data);
-    },
-    getReply(data) {
-      this.$socket.emit("auto_reply", data);
-    },
+    ...mapActions([
+      "getUserInfo",
+      "getFriendRequests",
+      "getFriends",
+      "getChatList",
+    ]),
+
     async logout() {
       await this.$api.logout();
       this.$store.commit("logout");

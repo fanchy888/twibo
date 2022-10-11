@@ -1,5 +1,6 @@
 from flask import jsonify, g, request, session, abort
 from . import bp, login_required
+from twibo_server.utils import logger
 
 
 from twibo_server.lib.user import User

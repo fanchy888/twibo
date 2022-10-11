@@ -14,7 +14,7 @@
           <el-empty
             v-else
             :image-size="200"
-            description="YouChat is not WeChat"
+            description="μChat is not WeChat"
           ></el-empty>
         </el-main>
       </el-container>
@@ -43,11 +43,11 @@ export default {
       allMessages: (state) => state.Chat.messageList,
     }),
   },
-  async mounted() {
-    await this.getFriendRequests();
-    await this.getFriends();
-    await this.getChatList();
-  },
+  // async mounted() {
+  //   await this.getFriendRequests();
+  //   await this.getFriends();
+  //   await this.getChatList();
+  // },
   methods: {
     ...mapActions([
       "getUserInfo",

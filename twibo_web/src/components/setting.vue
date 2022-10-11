@@ -51,7 +51,7 @@
       </el-form-item>
     </el-form>
     <el-button @click="updateInfo" type="primary" round plain class="btn"
-      >保存</el-button
+      >Save</el-button
     >
   </el-card>
 </template>

@@ -3,6 +3,7 @@ from . import bp, login_required
 from twibo_server import socketIO
 from twibo_server.lib.uchat import ChatRoom
 from twibo_server.lib.user import User
+from twibo_server.utils import logger
 
 
 @bp.route('/chats', methods=['GET'])
@@ -14,7 +15,6 @@ def get_chats():
 
 @socketIO.on('chat', namespace='/twibo')
 def chat(message):
-    print(message)
     User(message['sender']).send_msg(message)
 
 

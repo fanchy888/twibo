@@ -183,7 +183,7 @@ export default {
       }
     },
     login() {
-      if (!sessionStorage.token) {
+      if (!localStorage.token) {
         this.$router.push("/login");
       } else {
         this.$router.push("/");

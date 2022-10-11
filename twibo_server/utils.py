@@ -1,11 +1,18 @@
 import random
 import time
+import logging
+
 from base64 import b64encode, b64decode
 from datetime import datetime
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5
 
-from config import config
+from twibo_server.config import config
+
+logging.basicConfig(level=logging.DEBUG, format="[%(asctime)s][%(name)s][%(levelname)s]%(message)s",
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger('twibo')
+logger.setLevel(logging.DEBUG)
 
 
 def rsa_decrypt(message):

@@ -32,6 +32,7 @@ Vue.use(
       transports: ["websocket"],
       autoConnect: false,
       reconnection: true,
+      path: "/socket-chat",
     }),
     options: { autoConnect: false },
     vuex: {

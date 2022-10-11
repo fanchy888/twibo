@@ -18,7 +18,7 @@ function requestSuccessFunc(requestObj) {
     requestObj.cancelToken = new axios.CancelToken((cancel) => {
       axiosPromiseArr.push({ cancel });
     });
-    requestObj.headers.Authentication = sessionStorage.getItem("token");
+    requestObj.headers.Authentication = localStorage.getItem("token");
   }
 
   return requestObj;
@@ -49,7 +49,7 @@ function responseSuccessFunc(responseObj) {
     return eventBus.$emit("auth");
   }
 
-  if (code === 404 && meta.error_message === "App Group not exist") {
+  if (code === 404) {
     return eventBus.$emit("toHome");
   }
 

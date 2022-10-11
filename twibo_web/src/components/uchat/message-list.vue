@@ -99,7 +99,10 @@ export default {
       const month = time.getMonth() + 1;
       const day = time.getDate();
       const hour = time.getHours();
-      const minite = time.getMinutes();
+      let minite = time.getMinutes();
+      if (minite < 10) {
+        minite = "0" + minite;
+      }
       return year + "-" + month + "-" + day + " " + hour + ":" + minite;
     },
   },
@@ -115,7 +118,7 @@ export default {
     display: flex;
     max-width: 50%;
     text-align: left;
-
+    padding-left: 20px;
     .info {
       .title {
         line-height: 10px;
@@ -147,6 +150,7 @@ export default {
           padding-top: 10px;
           padding-bottom: 10px;
           white-space: pre-line;
+          max-width: 400px;
         }
       }
     }
@@ -192,6 +196,7 @@ export default {
           padding-top: 10px;
           padding-bottom: 10px;
           white-space: pre-line;
+          max-width: 400px;
         }
       }
     }

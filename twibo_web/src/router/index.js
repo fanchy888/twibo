@@ -45,7 +45,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.path === "/login") {
-    if (sessionStorage.getItem("token")) {
+    if (localStorage.getItem("token")) {
       next({ path: from.path });
     } else {
       next();
@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
   } else if (to.path === "/register") {
     next();
   } else {
-    if (!sessionStorage.getItem("token")) {
+    if (!localStorage.getItem("token")) {
       next({
         path: "/login",
         query: { redirect: to.fullPath },

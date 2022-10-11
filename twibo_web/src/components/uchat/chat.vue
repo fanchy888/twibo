@@ -69,6 +69,9 @@ export default {
       }
     },
     send() {
+      if (!this.message) {
+        return;
+      }
       const msg = {
         content: this.message,
         chat_id: this.chatInfo.chat_id,
