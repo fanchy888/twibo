@@ -18,8 +18,13 @@ def chat(message):
     User(message['sender']).send_msg(message)
 
 
-@socketIO.on('joinChat', namespace='/twibo')
-def join_chat(data):
+@socketIO.on('read', namespace='/twibo')
+def read_chat(data):
     user_id = data['user_id']
     chat_id = data['chat_id']
-    ChatRoom(chat_id).join_user(user_id)
+    ChatRoom(chat_id).user_active(user_id)
+
+
+@socketIO.on('joinChat', namespace='/twibo')
+def join_chat(user_id):
+    ChatRoom.join_chats(user_id)

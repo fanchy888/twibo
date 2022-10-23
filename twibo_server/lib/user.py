@@ -77,7 +77,7 @@ class User:
 
     @classmethod
     def upload_file(cls, file, data):
-        base_path = config.static_path
+        base_path = config.static_url
         file_type = data['type']
         user_id = data['user_id']
         suffix = file.filename.split('.')[-1]
@@ -164,9 +164,9 @@ class User:
 
         chat_id = ChatRoom.create([self.user_id, user_id])
 
-        self.say_hi(chat_id)
         socketIO.emit('clearRequest', [self.user_id, user_id], namespace='/twibo')
         socketIO.emit('createChat', [self.user_id, user_id], namespace='/twibo')
+        self.say_hi(chat_id)
 
     def reject_friend(self, user_id):
         request_model = FriendRequestModel.get_one(user_id, self.user_id)
@@ -204,4 +204,4 @@ class User:
 
     def send_msg(self, msg):
         Message.create(msg)
-        ChatRoom(msg['chat_id']).join_user(self.user_id)
+        ChatRoom(msg['chat_id']).user_active(self.user_id)

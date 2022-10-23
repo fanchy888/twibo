@@ -5,6 +5,8 @@ from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id
 from twibo_server import socketIO
 from twibo_server.config import config
+from flask_socketio import join_room, rooms
+from twibo_server.utils import logger
 
 
 class ChatRoom:
@@ -45,7 +47,7 @@ class ChatRoom:
     @classmethod
     def get_chat_room_for_users(cls, users):
         if len(users) == 2:
-            return ChatRoomModel.get_chat_from_members(*users)
+            return ChatRoomModel.get_chat_from_friends(*users)
         else:
             # group chat
             return None
@@ -71,7 +73,7 @@ class ChatRoom:
 
     @classmethod
     def get_chat_room(cls, user):
-        rooms = []
+        chat_rooms = []
         user_id = user.user_id
         friend_list = user.get_friends()
         friends = {f['user_id']: f for f in friend_list}
@@ -103,14 +105,22 @@ class ChatRoom:
             room['chat_id'] = chat_id
             room['messages'] = room_messages
             room['time'] = room_messages[-1]['time'] if room_messages else ''
-            rooms.append(room)
-        rooms = sorted(rooms, key=lambda x: x['time'], reverse=True)
-        return rooms
+            chat_rooms.append(room)
+        chat_rooms = sorted(chat_rooms, key=lambda x: x['time'], reverse=True)
+        return chat_rooms
 
-    def join_user(self, user_id):
+    def user_active(self, user_id):
         m = ChatMemberModel.get_member(self.chat_id, user_id)
         m.last_read = datetime.utcnow()
         m.save()
+
+    @classmethod
+    def join_chats(cls, user_id):
+        in_rooms = rooms(namespace='/twibo')
+        for chat in ChatRoomModel.get_by_user(user_id):
+            if chat.chat_id not in in_rooms:
+                join_room(chat.chat_id, namespace='/twibo')
+                logger.info(f'user{user_id} join room {chat.chat_id}')
 
 
 class Message:
@@ -130,7 +140,7 @@ class Message:
         ChatMessageModel(**data).save()
         data['time'] = int(datetime.utcnow().timestamp())
         if send:
-            socketIO.emit('chat', data, namespace='/twibo')
+            socketIO.emit('chat', data, room=chat_id, namespace='/twibo')
 
     def get_messages(self):
         msgs = ChatMessageModel.get_by_chat_id(self.chat_id)

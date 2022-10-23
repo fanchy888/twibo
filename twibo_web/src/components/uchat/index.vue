@@ -1,6 +1,6 @@
 <template>
-  <el-card shadow="always" style="height: 100%">
-    <el-container class="uchat">
+  <el-card shadow="always" style="height: 100%; width: 100%">
+    <el-container>
       <el-aside width="300px">
         <sideBar
           :friendList="friendList"

@@ -5,7 +5,10 @@ import { showError } from "@/utils/notification";
 const axiosPromiseArr = [];
 eventBus.$on("auth", () => {
   const { href, origin } = window.location;
-  window.location.href = `${origin}/login/?forward=${encodeURIComponent(href)}`;
+  localStorage.removeItem("token");
+  window.location.href = `${origin}/i/see/u/login/?forward=${encodeURIComponent(
+    href
+  )}`;
 });
 
 eventBus.$on("toHome", () => {

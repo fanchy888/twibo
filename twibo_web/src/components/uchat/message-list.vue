@@ -49,7 +49,7 @@
 </template>
 <script>
 import { mapState } from "vuex";
-import { avatarSrc, timedelta } from "@/utils/common";
+import { avatarSrc, convertTime } from "@/utils/common";
 export default {
   name: "messageList",
   props: [],
@@ -86,24 +86,12 @@ export default {
   },
   methods: {
     avatarSrc: avatarSrc,
+    convertTime: convertTime,
     scrollToBottom() {
       this.$nextTick(() => {
         var container = document.getElementById("scroll");
         container.scrollTop = container.scrollHeight;
       });
-    },
-    convertTime(t) {
-      if (!t) return "";
-      const time = new Date(t * 1000 - timedelta);
-      const year = time.getFullYear();
-      const month = time.getMonth() + 1;
-      const day = time.getDate();
-      const hour = time.getHours();
-      let minite = time.getMinutes();
-      if (minite < 10) {
-        minite = "0" + minite;
-      }
-      return year + "-" + month + "-" + day + " " + hour + ":" + minite;
     },
   },
 };

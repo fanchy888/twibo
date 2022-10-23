@@ -7,7 +7,7 @@
           <el-avatar
             v-if="user && user.avatar"
             :size="40"
-            :src="avatarUrl"
+            :src="avatarSrc(user.avatar)"
             class="ava-child"
           />
           <el-avatar v-else :size="40" icon="el-icon-user" class="ava-child">
@@ -60,7 +60,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-
+import { avatarSrc } from "@/utils/common";
 export default {
   name: "Home",
   data() {
@@ -73,9 +73,6 @@ export default {
     ...mapState({
       user: (state) => state.currentUser,
     }),
-    avatarUrl() {
-      return this.user ? this.$staticUrl + this.user.avatar : "";
-    },
   },
   async mounted() {
     if (!this.$store.state.Socket.isConnected) {
@@ -97,7 +94,7 @@ export default {
       "getFriends",
       "getChatList",
     ]),
-
+    avatarSrc: avatarSrc,
     async logout() {
       await this.$api.logout();
       this.$store.commit("logout");

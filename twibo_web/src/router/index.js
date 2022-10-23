@@ -39,7 +39,7 @@ const allRoutes = [makeRouteConfig(home)];
 
 const router = new VueRouter({
   mode: "history",
-  base: process.env.BASE_URL,
+  base: "/i/see/u/",
   routes: [...baseRoutes, ...allRoutes],
 });
 

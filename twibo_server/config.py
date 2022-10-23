@@ -1,24 +1,30 @@
+import yaml
+
+
+def load():
+    with open('./config.yaml') as f:
+        cfg_data = f.read()
+    return yaml.load(cfg_data, Loader=yaml.FullLoader)
+
 
 class Config:
     def __init__(self):
-        self._rsa_privat_key = None
+        self.cfg_data = load()['twibo_dev']
 
     @property
     def sqldb_url(self):
-        return 'mysql+pymysql://root:fan4308832@localhost:3306/twibo?charset=utf8mb4'
+        return self.cfg_data['sqldb']
 
     @property
     def rsa_private_key(self):
-        if not self._rsa_privat_key:
-            path = './private.rsa'
-            # path = '/home/ubuntu/twibo/twibo_server/private.rsa'
-            with open(path, 'r') as f:
-                self._rsa_privat_key = str(f.read())
-        return self._rsa_privat_key
+        path = self.cfg_data['rsa_path']
+        with open(path, 'r') as f:
+            rsa_privat_key = str(f.read())
+        return rsa_privat_key
 
     @property
-    def static_path(self):
-        return '/home/ubuntu/static/'
+    def static_url(self):
+        return self.cfg_data['static_file_path']
 
     @property
     def avatar_type(self):

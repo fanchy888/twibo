@@ -78,17 +78,18 @@ export default {
         sender: this.user.user_id,
       };
       this.updateLastRead();
-      this.$socket.emit("joinChat", {
+      this.$socket.emit("read", {
         user_id: this.user.user_id,
         chat_id: msg.chat_id,
       });
+      this.$socket.emit("joinChat", this.user.user_id);
       this.$socket.emit("chat", msg);
       this.message = "";
     },
     onClick(e) {
       if (document.getElementById("content").contains(e.target)) {
         this.updateLastRead();
-        this.$socket.emit("joinChat", {
+        this.$socket.emit("read", {
           user_id: this.user.user_id,
           chat_id: this.chatInfo.chat_id,
         });

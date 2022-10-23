@@ -1,16 +1,16 @@
 import Vue from "vue";
 import App from "./App.vue";
-import "./registerServiceWorker";
-import router from "./router";
-import store from "./store";
+import "../../registerServiceWorker";
+import router from "../../router";
+import store from "../../store";
 import inject from "@/plugins/inject";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import VueSocketio from "vue-socket.io";
 import socketIO from "socket.io-client";
 import JSEncrypt from "jsencrypt";
-import { rsaPublicKey } from "./rsa";
-import { staticUrl } from "@/utils/common";
+import { rsaPublicKey } from "../../rsa";
+import { host } from "@/utils/common";
 Vue.config.productionTip = false;
 
 Vue.prototype.$getRsaCode = function (str) {
@@ -21,14 +21,12 @@ Vue.prototype.$getRsaCode = function (str) {
   return data;
 };
 
-Vue.prototype.$staticUrl = staticUrl;
-
 Vue.use(ElementUI);
 Vue.use(inject);
 Vue.use(
   new VueSocketio({
     debug: true,
-    connection: socketIO("http://192.168.5.2:5000/twibo", {
+    connection: socketIO(host.localhost + "twibo", {
       transports: ["websocket"],
       autoConnect: false,
       reconnection: true,
@@ -54,4 +52,4 @@ new Vue({
     },
   },
   render: (h) => h(App),
-}).$mount("#app");
+}).$mount("#twibo");

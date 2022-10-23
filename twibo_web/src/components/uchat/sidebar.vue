@@ -7,12 +7,7 @@
         placeholder="search"
       ></el-input>
     </div>
-    <el-tabs
-      v-model="activeName"
-      type="border-card"
-      @tab-click="handleClick"
-      stretch
-    >
+    <el-tabs v-model="activeName" type="border-card" stretch>
       <el-tab-pane name="chat">
         <span slot="label" style="font-size: 20px"
           ><el-badge is-dot :hidden="!unreadChat" style="line-height: 15px">
@@ -252,7 +247,7 @@
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
-import { timedelta, avatarSrc } from "@/utils/common";
+import { convertTime, avatarSrc } from "@/utils/common";
 
 export default {
   name: "sideBar",
@@ -298,14 +293,11 @@ export default {
       "changeChatRoom",
     ]),
     avatarSrc: avatarSrc,
-    handleClick() {},
-    // avatarSrc(avatar) {
-    //   return this.$staticUrl + avatar;
-    // },
+    convertTime: convertTime,
 
     joinChat(chat) {
       this.changeChatRoom(chat);
-      this.$socket.emit("joinChat", {
+      this.$socket.emit("read", {
         user_id: this.user.user_id,
         chat_id: chat.chat_id,
       });
@@ -414,17 +406,6 @@ export default {
       }
     },
 
-    convertTime(t) {
-      if (!t) return "";
-      const time = new Date(t * 1000 - timedelta);
-      const year = time.getFullYear();
-      const month = time.getMonth() + 1;
-      const day = time.getDate();
-      const hour = time.getHours();
-      const minite = time.getMinutes();
-      return year + "-" + month + "-" + day + " " + hour + ":" + minite;
-    },
-
     getLastMsg(messages) {
       if (messages && messages.length > 0) {
         return messages[messages.length - 1].content;
@@ -507,6 +488,7 @@ export default {
   .time {
     font-size: 10px;
     color: #a6a6a8;
+    width: 110px;
   }
   .msg {
     font-size: 10px;

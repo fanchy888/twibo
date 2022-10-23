@@ -17,6 +17,7 @@ export default {
       const param = { $query: { user_id: rootState.currentUser.user_id } };
       const chatList = await api.getChatList(param);
       commit("SET_STATE", { chatList: chatList });
+      this._vm.$socket.emit("joinChat", rootState.currentUser.user_id);
     },
 
     addMessage({ state, commit }, msg) {

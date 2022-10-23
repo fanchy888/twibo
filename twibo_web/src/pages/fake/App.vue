@@ -1,9 +1,14 @@
 <template>
-  <div id="app">
-    <router-view />
+  <div id="fake">
+    <home></home>
   </div>
 </template>
-<script></script>
+<script>
+import home from "./components/home";
+export default {
+  components: { home },
+};
+</script>
 <style lang="scss">
 * {
   margin: 0;
@@ -12,7 +17,7 @@
 }
 html,
 body,
-#app {
+#fake {
   font-family: "PingFang SC";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

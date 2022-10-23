@@ -13,7 +13,7 @@
               v-loading="loading"
               v-if="user && user.avatar"
               :size="100"
-              :src="avatarUrl"
+              :src="avatarSrc(user.avatar)"
               class="ava-child"
             ></el-avatar>
             <el-avatar v-else :size="100" class="ava-child">
@@ -57,6 +57,8 @@
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
+import { avatarSrc } from "@/utils/common";
+
 export default {
   name: "setting",
   data() {
@@ -69,9 +71,7 @@ export default {
     ...mapState({
       user: (state) => state.currentUser,
     }),
-    avatarUrl() {
-      return this.user ? this.$staticUrl + this.user.avatar : "";
-    },
+
     tooltipInfo() {
       return this.user && this.user.avatar ? "点击修改头像" : "上传头像";
     },
@@ -85,6 +85,8 @@ export default {
   },
   methods: {
     ...mapActions(["getUserInfo"]),
+    avatarSrc: avatarSrc,
+
     async uploadAvatar(param) {
       let data = new FormData();
       data.append("file", param.file);

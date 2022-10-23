@@ -33,7 +33,7 @@ class ChatRoomModel(Base, MixinBase):
                         cls, cls.chat_id == ChatMemberModel.chat_id).filter(cls.chat_id == chat_id).all()
 
     @classmethod
-    def get_chat_from_members(cls, user1, user2):
+    def get_chat_from_friends(cls, user1, user2):
         with session_manager() as session:
             chat_ids = session.query(cls.chat_id).join(ChatMemberModel, cls.chat_id == ChatMemberModel.chat_id).filter(
                         ChatMemberModel.user_id == user1, cls.chat_type == cls.PERSONAL).all()
