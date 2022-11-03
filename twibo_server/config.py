@@ -9,7 +9,7 @@ def load():
 
 class Config:
     def __init__(self):
-        self.cfg_data = load()['twibo_dev']
+        self.cfg_data = load()['twibo']
 
     @property
     def sqldb_url(self):

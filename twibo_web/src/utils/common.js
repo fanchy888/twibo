@@ -1,6 +1,6 @@
 export const host = {
   localhost: "http://192.168.5.2:5000/",
-  production: "http://101.42.236.38/",
+  production: "http://www.twibo.icu/",
 };
 
 export const staticUrl = host.production + "static/";

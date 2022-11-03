@@ -82,7 +82,6 @@ export default {
         user_id: this.user.user_id,
         chat_id: msg.chat_id,
       });
-      this.$socket.emit("joinChat", this.user.user_id);
       this.$socket.emit("chat", msg);
       this.message = "";
     },

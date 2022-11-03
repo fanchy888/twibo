@@ -29,7 +29,7 @@ export default {
   methods: {
     jump2twibo() {
       console.log(host.production);
-      window.location.href = "http://localhost:8080/twibo";
+      window.location.href = host.production + "i/see/u";
     },
     cancel() {
       this.pill = false;
