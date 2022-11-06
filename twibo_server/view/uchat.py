@@ -13,6 +13,14 @@ def get_chats():
     return jsonify(meta={'code': 200}, data=rooms)
 
 
+@bp.route('/chats/<chat_id>/img', methods=['POST'])
+def upload_img(chat_id):
+    file_list = request.files.getlist("file")
+    user = User(g.user_id)
+    info = ChatRoom(chat_id).send_imgs(user, file_list)
+    return jsonify(meta={'code': 200}, data=info)
+
+
 @socketIO.on('chat', namespace='/twibo')
 def chat(message):
     User(message['sender']).send_msg(message)

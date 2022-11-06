@@ -46,6 +46,7 @@ class ChatRoomModel(Base, MixinBase):
         with session_manager() as session:
             session.query(cls).filter(cls.chat_id == chat_id).delete()
             session.query(ChatMemberModel).filter(ChatMemberModel.chat_id == chat_id).delete()
+            session.query(ChatMessageModel).filter(ChatMessageModel.chat_id == chat_id).delete()
             session.commit()
 
     @classmethod
@@ -98,6 +99,6 @@ class ChatMessageModel(Base, MixinBase):
             'chat_id': self.chat_id,
             'sender': self.sender,
             'content': self.content,
-            'type': self.content_type,
+            'content_type': self.content_type,
             'time': self.create_time.timestamp()
         }

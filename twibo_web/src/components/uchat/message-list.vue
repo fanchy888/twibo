@@ -4,9 +4,21 @@
       <div v-if="msg.sender === user.user_id" class="right">
         <div class="info">
           <div class="content">
-            <div class="detail">
+            <div class="detail" v-if="msg.content_type == 0">
               {{ msg.content }}
             </div>
+
+            <el-image
+              v-else
+              :src="imgSrc(msg.content)"
+              class="img-item"
+              @load="scrollToBottom"
+              @error="scrollToBottom"
+            >
+              <div slot="error" style="font-size: 3rem">
+                <i class="el-icon-picture-outline"></i></div
+            ></el-image>
+
             <div class="time">
               {{ convertTime(msg.time) }}
             </div>
@@ -35,9 +47,21 @@
         <div class="info">
           <div class="title">{{ msg.name }}</div>
           <div class="content">
-            <div class="detail">
+            <div class="detail" v-if="msg.content_type == 0">
               {{ msg.content }}
             </div>
+
+            <el-image
+              v-else
+              :src="imgSrc(msg.content)"
+              class="img-item"
+              @load="scrollToBottom"
+              @error="scrollToBottom"
+            >
+              <div slot="error" style="font-size: 3rem">
+                <i class="el-icon-picture-outline"></i></div
+            ></el-image>
+
             <div class="time">
               {{ convertTime(msg.time) }}
             </div>
@@ -49,7 +73,7 @@
 </template>
 <script>
 import { mapState } from "vuex";
-import { avatarSrc, convertTime } from "@/utils/common";
+import { avatarSrc, imgSrc, convertTime } from "@/utils/common";
 export default {
   name: "messageList",
   props: [],
@@ -87,9 +111,11 @@ export default {
   methods: {
     avatarSrc: avatarSrc,
     convertTime: convertTime,
+    imgSrc: imgSrc,
     scrollToBottom() {
       this.$nextTick(() => {
         var container = document.getElementById("scroll");
+
         container.scrollTop = container.scrollHeight;
       });
     },
@@ -102,6 +128,7 @@ export default {
   overflow-y: auto;
 }
 .msg-item {
+  padding-top: 15px;
   .left {
     display: flex;
     max-width: 50%;
@@ -116,8 +143,9 @@ export default {
         padding-left: 10px;
       }
       .content {
+        display: flex;
+        flex-direction: column;
         padding-left: 10px;
-        display: inline-block;
         .time {
           line-height: 10px;
           font-size: 12px;
@@ -153,7 +181,7 @@ export default {
     padding-right: 20px;
     .info {
       text-align: right;
-
+      padding-right: 10px;
       .title {
         line-height: 10px;
         font-size: 15px;
@@ -162,8 +190,8 @@ export default {
         padding-right: 10px;
       }
       .content {
-        padding-right: 10px;
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
         .time {
           line-height: 10px;
           font-size: 12px;
@@ -191,5 +219,8 @@ export default {
   }
   min-height: 50px;
   line-height: 50px;
+}
+.img-item {
+  padding-top: 2px;
 }
 </style>

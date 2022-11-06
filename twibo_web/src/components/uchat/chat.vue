@@ -7,6 +7,13 @@
       <messageList ref="messageList"></messageList>
     </div>
     <div class="chat-input">
+      <div class="chat-tool">
+        <emoji @emoji_click="selectEmoji"></emoji>
+        <uploadImg
+          :chatInfo="chatInfo"
+          @updateLastRead="updateLastRead"
+        ></uploadImg>
+      </div>
       <el-input
         type="textarea"
         :rows="5"
@@ -32,10 +39,11 @@
 <script>
 import messageList from "./message-list";
 import { mapActions, mapState } from "vuex";
-
+import emoji from "./emoji";
+import uploadImg from "./file-upload/img";
 export default {
-  name: "charRoom",
-  components: { messageList },
+  name: "chatRoom",
+  components: { messageList, emoji, uploadImg },
   props: ["chatInfo"],
   watch: {
     chatInfo() {
@@ -94,12 +102,15 @@ export default {
         });
       }
     },
+    selectEmoji(emoji) {
+      this.message = this.message + emoji;
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 .chat-block {
-  height: 700px;
+  height: 750px;
 }
 .chat-header {
   height: 40px;
@@ -126,5 +137,14 @@ export default {
     line-height: 40px;
     text-align: right;
   }
+}
+.chat-tool {
+  display: flex;
+  height: 20px;
+  line-height: 20px;
+  margin-bottom: 5px;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
 }
 </style>

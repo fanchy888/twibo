@@ -1,6 +1,7 @@
 import { timedelta } from "@/utils/common";
 import api from "@/plugins/api";
-
+import { showNotification } from "@/utils/notification";
+import router from "@/router";
 export default {
   state: {
     chatList: [],
@@ -20,13 +21,22 @@ export default {
       this._vm.$socket.emit("joinChat", rootState.currentUser.user_id);
     },
 
-    addMessage({ state, commit }, msg) {
+    addMessage({ rootState, state, commit }, msg) {
       const chatList = state.chatList;
       const chat_id = msg.chat_id;
       const chatRoom = chatList.find((c) => c.chat_id === chat_id) || {};
       const messages = chatRoom.messages || [];
       messages.push(msg);
       chatRoom.time = msg.time;
+      if (
+        chatRoom.members &&
+        msg.sender !== rootState.currentUser.user_id &&
+        router.app._route.name !== "uchat"
+      ) {
+        const sender = chatRoom.members.find((m) => m.user_id === msg.sender);
+        const content = msg.type ? "You have a new message" : msg.content;
+        showNotification(content, sender.name);
+      }
       chatList.sort((a, b) => {
         return b["time"] - a["time"];
       });

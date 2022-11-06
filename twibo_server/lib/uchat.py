@@ -1,12 +1,15 @@
+import os
+import copy
+
 from datetime import datetime
 from twibo_server.model.chat import ChatRoomModel, ChatMessageModel, ChatMemberModel
 from twibo_server.model.friend import FriendModel
 from twibo_server.lib.exception import ParameterError
-from twibo_server.utils import rsa_decrypt, generate_id
 from twibo_server import socketIO
 from twibo_server.config import config
 from flask_socketio import join_room, rooms
 from twibo_server.utils import logger
+from twibo_server.utils import generate_id, create_thumbnail
 
 
 class ChatRoom:
@@ -122,6 +125,35 @@ class ChatRoom:
                 join_room(chat.chat_id, namespace='/twibo')
                 logger.info(f'user{user_id} join room {chat.chat_id}')
 
+    def send_imgs(self, user, files):
+        msgs = []
+        for file in files:
+            file_name = self.save_img(file)
+            data = {
+                'sender': user.user_id,
+                'chat_id': int(self.chat_id),
+                'content': file_name,
+                'content_type': ChatMessageModel.PIC
+            }
+            msgs.append(data)
+        return msgs
+
+    @staticmethod
+    def save_img(file):
+        base_path = config.img_url
+        suffix = file.filename.split('.')[-1]
+        if suffix not in config.img_type:
+            raise ParameterError(400, f'不支持文件格式 .{suffix}')
+
+        file_content = file.read()
+        thumbnail = create_thumbnail(file_content)
+        name = generate_id('img')
+
+        file_name = name + '.' + suffix
+        file_path = os.path.join(base_path, file_name)
+        thumbnail.save(file_path)
+        return file_name
+
 
 class Message:
     def __init__(self, chat_id):
@@ -135,7 +167,8 @@ class Message:
         data = {
             'sender': sender,
             'chat_id': chat_id,
-            'content': content
+            'content': content,
+            'content_type': msg.get('content_type', 0)
         }
         ChatMessageModel(**data).save()
         data['time'] = int(datetime.utcnow().timestamp())

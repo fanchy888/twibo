@@ -83,7 +83,7 @@ class User:
         suffix = file.filename.split('.')[-1]
         file_name = file.filename
         if file_type == 'avatar':
-            if suffix not in config.avatar_type:
+            if suffix not in config.img_type:
                 raise ParameterError(400, f'不支持文件格式 .{suffix}')
             file_name = f'avatar-{user_id}.{suffix}'
             user = UserModel.get(user_id)

@@ -56,7 +56,10 @@
         <div class="chat" v-loading="loading">
           <div class="add">
             <el-button icon="el-icon-plus" @click="addVisible = true"
-              >Add</el-button
+              >Friend</el-button
+            >
+            <el-button icon="el-icon-plus" @click="groupVisible = true"
+              >Group</el-button
             >
           </div>
           <el-collapse v-model="activeFriend">
@@ -180,7 +183,7 @@
                           type="success"
                           size="small"
                           icon="el-icon-chat-dot-round"
-                          @click="jumpToChat(friend, index)"
+                          @click="jumpToFriendChat(friend, index)"
                           >Chat</el-button
                         >
                         <el-button
@@ -202,6 +205,14 @@
                   </el-popover>
                 </div></div
             ></el-collapse-item>
+            <el-collapse-item name="group" title="Groups">
+              <groupChat
+                v-for="(group, index) in filterdGroups"
+                :key="index.toString()"
+                :group="group"
+                @jumpToChat="jumpToGroupChat"
+              ></groupChat>
+            </el-collapse-item>
           </el-collapse>
         </div>
       </el-tab-pane>
@@ -248,16 +259,18 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import { convertTime, avatarSrc } from "@/utils/common";
-
+import groupChat from "./group-chat";
 export default {
   name: "sideBar",
-  props: ["friendList", "chatList", "friendRequests"],
+  components: { groupChat },
+  props: ["friendList", "chatList", "friendRequests", "groupList"],
   data() {
     return {
       activeName: "chat",
       activeFriend: ["friend"],
       searchInfo: "",
       addVisible: false,
+      groupVisible: false,
       searchUserText: "",
       searchResult: null,
       dloading: false,
@@ -275,6 +288,11 @@ export default {
         (f) =>
           (f.nick_name && f.nick_name.includes(this.searchInfo)) ||
           f.name.includes(this.searchInfo)
+      );
+    },
+    filterdGroups() {
+      return this.groupList.filter(
+        (f) => f.name && f.name.includes(this.searchInfo)
       );
     },
     filterdChatList() {
@@ -371,7 +389,7 @@ export default {
         this.editName = false;
       }
     },
-    jumpToChat(friend, index) {
+    jumpToFriendChat(friend, index) {
       this.activeName = "chat";
       this.$refs["popRef" + index][0].doClose();
       const chat = this.chatList.find((c) => c.user_id === friend.user_id);
@@ -379,7 +397,13 @@ export default {
         this.joinChat(chat);
       }
     },
-
+    jumpToGroupChat(group) {
+      this.activeName = "chat";
+      const chat = this.chatList.find((c) => c.group_id === group.group_id);
+      if (chat) {
+        this.joinChat(chat);
+      }
+    },
     async clickDelete(friend) {
       const res = await this.$confirm("Are you fucking sure?", {
         confirmButtonText: "FUCK YOU",
@@ -408,7 +432,11 @@ export default {
 
     getLastMsg(messages) {
       if (messages && messages.length > 0) {
-        return messages[messages.length - 1].content;
+        if (messages[messages.length - 1].content_type == 0) {
+          return messages[messages.length - 1].content;
+        } else {
+          return "[图片]";
+        }
       } else {
         return "";
       }

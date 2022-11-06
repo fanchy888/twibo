@@ -1,4 +1,5 @@
 import api from "@/plugins/api";
+import { showNotification } from "@/utils/notification";
 export default {
   state: {
     friendRequests: [],
@@ -38,6 +39,7 @@ export default {
             .length
         ) {
           state.friendRequests.push(data.sender);
+          showNotification("Send you a friend request", data.sender.name);
         }
       }
     },

@@ -1,6 +1,7 @@
 export const host = {
   localhost: "http://192.168.5.2:5000/",
-  production: "http://www.twibo.icu/",
+  production: "https://www.twibo.icu/",
+  wss: "wss://www.twibo.icu/",
 };
 
 export const staticUrl = host.production + "static/";
@@ -8,6 +9,9 @@ export const timedelta = new Date().getTimezoneOffset() * 60 * 1000;
 
 export function avatarSrc(avatar) {
   return staticUrl + avatar;
+}
+export function imgSrc(imgUrl) {
+  return staticUrl + "img/" + imgUrl;
 }
 
 export function convertTime(t) {

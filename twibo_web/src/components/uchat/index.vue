@@ -6,6 +6,7 @@
           :friendList="friendList"
           :chatList="chatList"
           :friendRequests="friendRequests"
+          :groupList="groupList"
         ></sideBar>
       </el-aside>
       <el-container>
@@ -31,6 +32,7 @@ export default {
   data() {
     return {
       chat: {},
+      groupList: [],
     };
   },
   computed: {

@@ -76,7 +76,7 @@ export default {
         { name: "9", url: "/images/9.jpg" },
         { name: "10", url: "/images/10.jpg" },
         { name: "11", url: "/images/11.jpg" },
-        { name: "12", url: "/images/12.jpg" },
+        // { name: "12", url: "/images/12.jpg" },
         { name: "calendar" },
       ],
       silverKiller: [

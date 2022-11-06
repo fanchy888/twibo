@@ -27,7 +27,11 @@ class Config:
         return self.cfg_data['static_file_path']
 
     @property
-    def avatar_type(self):
+    def img_url(self):
+        return self.cfg_data['static_file_path'] + 'img/'
+
+    @property
+    def img_type(self):
         return {'jpg', 'png', 'jpeg', 'gif'}
 
 

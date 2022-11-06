@@ -1,6 +1,8 @@
+import io
 import random
 import time
 import logging
+from PIL import Image
 
 from base64 import b64encode, b64decode
 from datetime import datetime
@@ -26,3 +28,11 @@ def generate_id(prefix=''):
     ts = datetime.fromtimestamp(ts).strftime('%y%m%d%H%M%S')
     encode_ts = ts.encode('utf-8')
     return f'{prefix}-{b64encode(encode_ts).decode("utf-8")}'
+
+
+def create_thumbnail(file, target_size=300):
+    image = Image.open(io.BytesIO(file))
+    x, y = image.size
+    factor = max(x/target_size, y/target_size)
+    thumb = image.resize((int(x/factor), int(y/factor)), Image.ANTIALIAS)
+    return thumb
