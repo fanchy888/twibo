@@ -29,6 +29,7 @@
           :src="avatarSrc(msg.avatar)"
           :size="40"
           shape="square"
+          fit="contain"
         ></el-avatar>
         <el-avatar v-else :size="40" shape="square">
           <span style="font-size: 30px"><i class="el-icon-user"></i></span>
@@ -40,6 +41,7 @@
           :src="avatarSrc(msg.avatar)"
           :size="40"
           shape="square"
+          fit="contain"
         ></el-avatar>
         <el-avatar v-else :size="40" shape="square">
           <span style="font-size: 30px"><i class="el-icon-user"></i></span>

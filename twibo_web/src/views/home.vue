@@ -9,6 +9,7 @@
             :size="40"
             :src="avatarSrc(user.avatar)"
             class="ava-child"
+            fit="contain"
           />
           <el-avatar v-else :size="40" icon="el-icon-user" class="ava-child">
           </el-avatar>
@@ -81,10 +82,12 @@ export default {
     if (!this.user) {
       await this.getUserInfo();
     }
-    await this.getFriendRequests();
-    await this.getFriends();
-    await this.getChatList();
-    this.active = this.$route.name;
+    if (this.user.user_id) {
+      await this.getFriendRequests();
+      await this.getFriends();
+      await this.getChatList();
+      this.active = this.$route.name;
+    }
   },
 
   methods: {

@@ -11,6 +11,7 @@ import socketIO from "socket.io-client";
 import JSEncrypt from "jsencrypt";
 import { rsaPublicKey } from "../../rsa";
 import { host } from "@/utils/common";
+import VueCookies from "vue-cookies";
 Vue.config.productionTip = false;
 
 Vue.prototype.$getRsaCode = function (str) {
@@ -21,6 +22,7 @@ Vue.prototype.$getRsaCode = function (str) {
   return data;
 };
 
+Vue.use(VueCookies);
 Vue.use(ElementUI);
 Vue.use(inject);
 Vue.use(

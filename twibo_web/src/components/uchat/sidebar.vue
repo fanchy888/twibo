@@ -26,6 +26,7 @@
                 :src="avatarSrc(chat.avatar)"
                 :size="40"
                 shape="square"
+                fit="contain"
               ></el-avatar>
               <el-avatar v-else :size="40" shape="square">
                 <span style="font-size: 30px"
@@ -82,6 +83,7 @@
                     v-if="friend.avatar"
                     :src="avatarSrc(friend.avatar)"
                     :size="40"
+                    fit="contain"
                   ></el-avatar>
                   <el-avatar v-else :size="40">
                     <span style="font-size: 30px"
@@ -122,6 +124,7 @@
                   v-if="friend.avatar"
                   :src="avatarSrc(friend.avatar)"
                   :size="40"
+                  fit="contain"
                 ></el-avatar>
                 <el-avatar v-else :size="40">
                   <span style="font-size: 30px"
@@ -142,6 +145,7 @@
                         v-if="friend.avatar"
                         :src="avatarSrc(friend.avatar)"
                         :size="50"
+                        fit="contain"
                       ></el-avatar>
                       <el-avatar v-else :size="50">
                         <span style="font-size: 40px"
@@ -234,6 +238,7 @@
               v-if="searchResult.avatar"
               :src="avatarSrc(searchResult.avatar)"
               :size="80"
+              fit="contain"
             ></el-avatar>
             <el-avatar v-else :size="80">
               <span style="font-size: 50px"><i class="el-icon-user"></i></span>

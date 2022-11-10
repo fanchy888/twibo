@@ -5,7 +5,7 @@ from twibo_server.model.user import UserModel
 from twibo_server.model.friend import FriendModel, FriendRequestModel
 from twibo_server.lib.uchat import ChatRoom, Message
 from twibo_server.lib.exception import ParameterError
-from twibo_server.utils import rsa_decrypt, generate_id
+from twibo_server.utils import rsa_decrypt, generate_id, create_avatar, generate_pwd
 from twibo_server import socketIO
 
 
@@ -40,6 +40,7 @@ class User:
     @classmethod
     def create(cls, data):
         name = data['name']
+        account = data['account']
         email = data['email']
         passwd = data['password']
         passwd = rsa_decrypt(passwd)
@@ -52,6 +53,7 @@ class User:
         user = {
             'name': name,
             'password': passwd,
+            'account': account,
             'email': email,
             'user_id': user_id
         }
@@ -61,10 +63,10 @@ class User:
 
     @classmethod
     def login(cls, data):
-        email = data['email']
+        account = data['account']
         passwd = data['password']
         passwd = rsa_decrypt(passwd)
-        user = UserModel.get_by_email(email)
+        user = UserModel.get_by_account(account)
         if not user:
             raise ParameterError(400, 'User Account does not exist')
         if not user.check_password(passwd):
@@ -74,6 +76,21 @@ class User:
         # todo: optimize generate token
         data['token'] = user.user_id
         return data
+
+    @classmethod
+    def reset_password(cls, data):
+        account = data['account']
+        email = data['email']
+        user = UserModel.get_by_account(account)
+        if not user:
+            raise ParameterError(400, 'Account does not exist')
+        if user.email != email:
+            raise ParameterError(400, 'Incorrect Email address ')
+        else:
+            password = generate_pwd()
+            user.password = password
+
+
 
     @classmethod
     def upload_file(cls, file, data):
@@ -89,8 +106,11 @@ class User:
             user = UserModel.get(user_id)
             user.avatar = file_name
             user.save()
-        file_path = os.path.join(base_path, file_name)
-        file.save(file_path)
+            file_path = os.path.join(base_path, file_name)
+
+            file_content = file.read()
+            thumbnail = create_avatar(file_content)
+            thumbnail.save(file_path)
 
     def update_info(self, data):
         name = data['name']

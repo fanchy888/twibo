@@ -9,7 +9,8 @@ class UserModel(Base, MixinBase):
 
     user_id = Column(VARCHAR(32), primary_key=True)
     name = Column(VARCHAR(32), nullable=False, unique=True)
-    email = Column(VARCHAR(64), nullable=False, unique=True)  # register account
+    email = Column(VARCHAR(64), nullable=False)
+    account = Column(VARCHAR(64), nullable=False, unique=True)
     _password_hash_ = Column(VARCHAR(256), nullable=False)
     avatar = Column(VARCHAR(128))
     description = Column(VARCHAR(64))
@@ -24,6 +25,11 @@ class UserModel(Base, MixinBase):
     def get_by_email(cls, email):
         with session_manager() as session:
             return session.query(cls).filter(cls.email == email).one_or_none()
+
+    @classmethod
+    def get_by_account(cls, account):
+        with session_manager() as session:
+            return session.query(cls).filter(cls.account == account).one_or_none()
 
     @classmethod
     def get_by_name(cls, name):
@@ -81,6 +87,7 @@ class UserModel(Base, MixinBase):
             'user_id': self.user_id,
             'email': self.email,
             'avatar': self.avatar,
+            'account': self.account,
             'description': self.description,
             'system_admin': self.system_admin
         }

@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import login from "../views/login";
 import register from "../views/register";
+import reset from "../views/reset";
 import { makeRouteConfig } from "./helper";
 import home from "./modules/home";
 
@@ -18,6 +19,11 @@ const baseRoutes = [
     path: "/register",
     name: "register",
     component: register,
+  },
+  {
+    path: "/reset",
+    name: "reset",
+    component: reset,
   },
   {
     path: "*",
@@ -39,7 +45,7 @@ const allRoutes = [makeRouteConfig(home)];
 
 const router = new VueRouter({
   mode: "history",
-  base: "/i/see/u/",
+  base: "/",
   routes: [...baseRoutes, ...allRoutes],
 });
 
@@ -51,6 +57,8 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (to.path === "/register") {
+    next();
+  } else if (to.path === "/reset") {
     next();
   } else {
     if (!localStorage.getItem("token")) {

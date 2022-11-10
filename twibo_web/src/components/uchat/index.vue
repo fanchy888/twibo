@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="always" style="height: 100%; width: 100%">
     <el-container>
-      <el-aside width="300px">
+      <el-aside width="310px">
         <sideBar
           :friendList="friendList"
           :chatList="chatList"

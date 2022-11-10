@@ -13,8 +13,17 @@
           :rules="rules"
           label-position="left"
         >
-          <el-form-item class="input-block" prop="email">
+          <el-form-item class="input-block" prop="account">
             <span slot="label" class="label">Acount:</span>
+            <el-input
+              v-model="formData.account"
+              placeholder=""
+              maxlength="50"
+              @change="formData.account = formData.account.trim()"
+            ></el-input>
+          </el-form-item>
+          <el-form-item class="input-block" prop="email">
+            <span slot="label" class="label">E-mail:</span>
             <el-input
               v-model="formData.email"
               placeholder=""
@@ -103,6 +112,9 @@ export default {
         email: [
           { required: true, message: "Email is required", trigger: "change" },
         ],
+        account: [
+          { required: true, message: "Account is required", trigger: "change" },
+        ],
         password: [
           { validator: validPassword, trigger: "change" },
           {
@@ -135,6 +147,7 @@ export default {
       loading: false,
       formData: {
         name: "",
+        account: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -152,6 +165,7 @@ export default {
     async submit(name) {
       this.$refs[name].validate((valid) => valid);
       if (
+        !this.formData.account ||
         !this.formData.email ||
         !this.formData.password ||
         !this.formData.confirmPassword ||
@@ -165,6 +179,7 @@ export default {
           name: this.formData.name,
           password: this.$getRsaCode(this.formData.password),
           email: this.formData.email,
+          account: this.formData.account,
         },
       };
       this.loading = true;
@@ -201,7 +216,7 @@ export default {
 }
 .login-form {
   width: 400px;
-  height: 650px;
+  height: 730px;
   top: 50%;
   left: 50%;
   border: 2px solid #eee;
@@ -234,19 +249,17 @@ img {
   color: #8696a7;
   text-align: center;
   position: relative;
-  margin-top: -60px;
-  margin-bottom: 20px;
+  margin-top: -80px;
   height: 50px;
 }
 .input-block {
   width: 330px;
-  height: 60px;
+  height: 70px;
   font-size: 13px;
   font-weight: 600;
   color: #8696a7;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 25px;
 }
 .btn {
   position: relative;

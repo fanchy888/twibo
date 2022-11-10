@@ -21,6 +21,13 @@ def login():
     return jsonify(meta={'code': 200}, data=user)
 
 
+@bp.route('/password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    User.reset_password(data)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
 @bp.route('/logout', methods=['GET'])
 @login_required
 def logout():

@@ -14,6 +14,7 @@
               v-if="user && user.avatar"
               :size="100"
               :src="avatarSrc(user.avatar)"
+              fit="contain"
               class="ava-child"
             ></el-avatar>
             <el-avatar v-else :size="100" class="ava-child">

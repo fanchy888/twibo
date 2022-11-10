@@ -4,6 +4,7 @@
       v-if="group.avatar"
       :src="avatarSrc(group.avatar)"
       :size="40"
+      fit="contain"
     ></el-avatar>
     <el-avatar v-else :size="40">
       <span style="font-size: 30px"><i class="el-icon-school"></i></span>
@@ -18,6 +19,7 @@
             v-if="group.avatar"
             :src="avatarSrc(group.avatar)"
             :size="50"
+            fit="contain"
           ></el-avatar>
           <el-avatar v-else :size="50">
             <span style="font-size: 40px"><i class="el-icon-user"></i></span>

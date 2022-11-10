@@ -13,13 +13,13 @@
           ref="formData"
           :rules="rules"
         >
-          <el-form-item class="input-block" prop="email">
+          <el-form-item class="input-block" prop="account">
             <!-- <span slot="label" class="label">Account:</span> -->
             <el-input
-              v-model="formData.email"
+              v-model="formData.account"
               placeholder="请输入账号"
               maxlength="50"
-              @change="formData.email = formData.email.trim()"
+              @change="formData.account = formData.account.trim()"
             >
               <i slot="prefix" class="el-input__icon el-icon-user"></i>
             </el-input>
@@ -36,6 +36,9 @@
             >
               <i slot="prefix" class="el-input__icon el-icon-lock"></i>
             </el-input>
+            <div class="foot1">
+              <span class="foot1-btn" @click="resetPwd">Forget password?</span>
+            </div>
           </el-form-item>
           <div class="btn">
             <el-button type="primary" @click="login('formData')" round
@@ -45,7 +48,7 @@
         </el-form>
 
         <div class="foot">
-          Don't hava an account?
+          Hava no account?
           <span class="foot-btn" @click="register">Register Now</span>
         </div>
       </div>
@@ -62,7 +65,7 @@ export default {
       show: false,
       timer: "",
       rules: {
-        email: [
+        account: [
           { required: true, message: "Account is required", trigger: "change" },
         ],
         password: [
@@ -74,7 +77,7 @@ export default {
         ],
       },
       formData: {
-        email: "",
+        account: "",
         password: "",
       },
     };
@@ -88,22 +91,24 @@ export default {
   methods: {
     async login(name) {
       this.$refs[name].validate((valid) => valid);
-      if (!this.formData.email || !this.formData.password) {
+      if (!this.formData.account || !this.formData.password) {
         return;
       }
       const encryptPasswd = this.$getRsaCode(this.formData.password);
       const userInfo = await this.$api.login({
-        email: this.formData.email,
+        account: this.formData.account,
         password: encryptPasswd,
       });
 
       this.$store.commit("login", userInfo);
-
       let redirect = this.$route.query.redirect || "/";
       this.$router.push(redirect);
     },
     register() {
       this.$router.push("/register");
+    },
+    resetPwd() {
+      this.$router.push("/reset");
     },
   },
 };
@@ -164,7 +169,7 @@ img {
 .btn {
   position: relative;
   text-align: center;
-  margin-top: 40px;
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 .foot {
@@ -177,6 +182,21 @@ img {
   font-size: 13px;
 }
 .foot-btn:hover {
+  color: #e6a23c;
+  cursor: pointer;
+}
+
+.foot1 {
+  font-size: 10px;
+  color: #bfbfbf;
+  padding-top: 10px;
+  text-align: center;
+  line-height: 20px;
+}
+.foot1-btn {
+  color: #bfbfbf;
+}
+.foot1-btn:hover {
   color: #e6a23c;
   cursor: pointer;
 }

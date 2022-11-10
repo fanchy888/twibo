@@ -18,7 +18,6 @@
   </div>
 </template>
 <script>
-import { host } from "@/utils/common";
 export default {
   name: "jump",
   data() {
@@ -28,8 +27,9 @@ export default {
   },
   methods: {
     jump2twibo() {
-      console.log(host.production);
-      window.location.href = host.production + "i/see/u";
+      this.$cookies.set("safeword", "lessismore", -1);
+      this.$router.replace("/twibo");
+      location.reload();
     },
     cancel() {
       this.pill = false;

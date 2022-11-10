@@ -36,3 +36,26 @@ def create_thumbnail(file, target_size=300):
     factor = max(x/target_size, y/target_size)
     thumb = image.resize((int(x/factor), int(y/factor)), Image.ANTIALIAS)
     return thumb
+
+
+def create_avatar(file, target_size=200):
+    image = Image.open(io.BytesIO(file))
+    x, y = image.size
+    half_edge = int(min(x, y)/2)
+    center = (int(x/2), int(y/2))
+    square = image.crop((center[0]-half_edge, center[1]-half_edge, center[0]+half_edge, center[1]+half_edge))
+    return square.resize((target_size, target_size), Image.ANTIALIAS)
+
+
+def generate_pwd():
+    new = random.sample('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ!@#$%^&*', 16)
+    print(''.join(new))
+    return ''.join(new)
+
+
+def send_email():
+    pass
+
+
+if __name__ == '__main__':
+    generate_pwd()

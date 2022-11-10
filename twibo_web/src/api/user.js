@@ -12,6 +12,12 @@ export default [
     path: "/api/register",
   },
   {
+    name: "resetPassword",
+    method: "POST",
+    desc: "reset password",
+    path: "/api/password",
+  },
+  {
     name: "login",
     method: "POST",
     desc: "login",
