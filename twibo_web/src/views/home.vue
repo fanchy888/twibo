@@ -21,7 +21,7 @@
               >
             </el-dropdown-item>
             <el-dropdown-item>
-              <span @click="logout"><i class="el-icon-ship"></i>Logout</span>
+              <span @click="logout"><i class="el-icon-ship"></i>Sign Out</span>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>

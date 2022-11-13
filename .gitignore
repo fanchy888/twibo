@@ -3,6 +3,6 @@
 __pycache__/
 twibo_venv/
 *.yaml
-*.rsa
+#*.rsa
 static/
 twibo_server/dist/

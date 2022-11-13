@@ -44,6 +44,18 @@ def get_user_info():
     return jsonify(meta={'code': 200}, data=user)
 
 
+@bp.route('/user/<user_id>/password', methods=['POST'])
+@login_required
+def update_password(user_id):
+    if g.user_id != user_id:
+        abort(400, 'No Access')
+    data = request.get_json()
+    new = data['new']
+    old = data['old']
+    User(user_id).change_password(old, new)
+    return jsonify(meta={'code': 200}, data={'success': True})
+
+
 @bp.route('/user', methods=['PATCH'])
 @login_required
 def update_user_info():

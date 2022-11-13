@@ -18,6 +18,12 @@ export default [
     path: "/api/password",
   },
   {
+    name: "changePassword",
+    method: "POST",
+    desc: "change password",
+    path: "/api/user/:user_id/password",
+  },
+  {
     name: "login",
     method: "POST",
     desc: "login",

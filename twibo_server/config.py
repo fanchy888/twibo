@@ -34,5 +34,9 @@ class Config:
     def img_type(self):
         return {'jpg', 'png', 'jpeg', 'gif'}
 
+    @property
+    def email_cfg(self):
+        return self.cfg_data['email']
+
 
 config = Config()

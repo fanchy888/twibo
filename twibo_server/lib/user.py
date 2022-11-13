@@ -7,6 +7,7 @@ from twibo_server.lib.uchat import ChatRoom, Message
 from twibo_server.lib.exception import ParameterError
 from twibo_server.utils import rsa_decrypt, generate_id, create_avatar, generate_pwd
 from twibo_server import socketIO
+from twibo_server.lib.tools import send_email
 
 
 class User:
@@ -70,7 +71,7 @@ class User:
         if not user:
             raise ParameterError(400, 'User Account does not exist')
         if not user.check_password(passwd):
-            raise ParameterError(400, 'Password incorrect')
+            raise ParameterError(400, 'Incorrect Password')
 
         data = user.to_json()
         # todo: optimize generate token
@@ -89,8 +90,13 @@ class User:
         else:
             password = generate_pwd()
             user.password = password
+            user.save()
 
-
+            content = f'''
+            <p>Your new password has been set as: <p> 
+            <h1>{password}<h1>
+            '''
+            send_email('reset password', content, email)
 
     @classmethod
     def upload_file(cls, file, data):
@@ -115,10 +121,20 @@ class User:
     def update_info(self, data):
         name = data['name']
         description = data['description']
+        email = data['email']
         if UserModel.check_duplicate_name(name, self.user_id):
             raise ParameterError(400, f'User {name} has already existed')
         self.model.name = name
         self.model.description = description
+        self.model.email = email
+        self.model.save()
+
+    def change_password(self, old, new):
+        old = rsa_decrypt(old)
+        new = rsa_decrypt(new)
+        if not self.model.check_password(old):
+            raise ParameterError(400, 'Password incorrect')
+        self.model.password = new
         self.model.save()
 
     def get_friends(self):
