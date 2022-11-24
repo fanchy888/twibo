@@ -30,13 +30,24 @@
               ></el-avatar>
               <el-avatar v-else :size="40" shape="square">
                 <span style="font-size: 30px"
-                  ><i class="el-icon-user"></i
+                  ><i
+                    v-if="chat.chat_type === 'group'"
+                    class="el-icon-s-grid"
+                  ></i>
+                  <i v-else class="el-icon-user"></i
                 ></span>
               </el-avatar>
             </el-badge>
             <div class="chat-item-info">
               <div class="chat-item-name">
-                <div class="name">{{ chat.name }}</div>
+                <div class="name">
+                  {{ chat.name
+                  }}<span
+                    v-if="chat.chat_type === 'group'"
+                    style="color: #85cfe5"
+                    >*</span
+                  >
+                </div>
               </div>
               <div class="chat-item-msg">
                 <div class="msg">{{ getLastMsg(chat.messages) }}</div>
@@ -259,20 +270,24 @@
         <div v-else>No Result</div>
       </div>
     </el-dialog>
+    <el-dialog width="50%" :visible.sync="groupVisible" destroy-on-close>
+      <groupEdit @closeDialog="groupVisible = false"></groupEdit>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
 import { convertTime, avatarSrc } from "@/utils/common";
-import groupChat from "./group-chat";
+import groupChat from "./group-item";
+import groupEdit from "./group-edit";
 export default {
   name: "sideBar",
-  components: { groupChat },
+  components: { groupChat, groupEdit },
   props: ["friendList", "chatList", "friendRequests", "groupList"],
   data() {
     return {
       activeName: "chat",
-      activeFriend: ["friend"],
+      activeFriend: [],
       searchInfo: "",
       addVisible: false,
       groupVisible: false,
@@ -385,7 +400,7 @@ export default {
         const params = {
           user_id: this.user.user_id,
           friend_user_id: friend.user_id,
-          $body: friend,
+          $body: { nick_name: friend.nick_name.trim() || friend.name },
         };
         await this.$api.updateFriend(params);
         await this.getChatList();
@@ -404,7 +419,7 @@ export default {
     },
     jumpToGroupChat(group) {
       this.activeName = "chat";
-      const chat = this.chatList.find((c) => c.group_id === group.group_id);
+      const chat = this.chatList.find((c) => c.chat_id === group.chat_id);
       if (chat) {
         this.joinChat(chat);
       }

@@ -6,7 +6,7 @@ export default {
   state: {
     chatList: [],
     currentChat: {},
-    messageList: {},
+    groupList: [],
   },
   mutations: {
     SET_STATE(state, obj) {
@@ -52,6 +52,13 @@ export default {
       chat.last_read = ((new Date().getTime() + timedelta) / 1000).toFixed();
       commit("SET_STATE", { currentChat: chat });
     },
+
+    async getGroups({ rootState, commit }) {
+      const user_id = rootState.currentUser.user_id;
+      const groups = await api.getGroups({ user_id });
+      commit("SET_STATE", { groupList: groups });
+    },
+
     SOCKET_chat({ dispatch }, receivedData) {
       dispatch("addMessage", receivedData);
     },
@@ -59,6 +66,19 @@ export default {
     SOCKET_createChat({ rootState, dispatch }, users) {
       if (users.find((x) => x === rootState.currentUser.user_id)) {
         dispatch("getChatList");
+      }
+    },
+    SOCKET_createGroup({ rootState, dispatch }, users) {
+      if (users.find((x) => x === rootState.currentUser.user_id)) {
+        dispatch("getChatList");
+        dispatch("getGroups");
+      }
+    },
+    SOCKET_kick({ rootState, dispatch }, data) {
+      if (data.user_id === rootState.currentUser.user_id) {
+        showNotification("You have been removed from group", data.name);
+        dispatch("getChatList");
+        dispatch("getGroups");
       }
     },
   },

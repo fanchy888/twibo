@@ -86,6 +86,7 @@ export default {
       await this.getFriendRequests();
       await this.getFriends();
       await this.getChatList();
+      await this.getGroups();
       this.active = this.$route.name;
     }
   },
@@ -96,6 +97,7 @@ export default {
       "getFriendRequests",
       "getFriends",
       "getChatList",
+      "getGroups",
     ]),
     avatarSrc: avatarSrc,
     async logout() {

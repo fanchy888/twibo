@@ -4,6 +4,7 @@ import copy
 from datetime import datetime
 from twibo_server.model.chat import ChatRoomModel, ChatMessageModel, ChatMemberModel
 from twibo_server.model.friend import FriendModel
+from twibo_server.model.group import GroupModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server import socketIO
 from twibo_server.config import config
@@ -48,7 +49,7 @@ class ChatRoom:
         return mem and mem.last_read.timestamp()
 
     @classmethod
-    def get_chat_room_for_users(cls, users):
+    def get_chat_room_for_users(cls, users):  # private
         if len(users) == 2:
             return ChatRoomModel.get_chat_from_friends(*users)
         else:
@@ -56,7 +57,7 @@ class ChatRoom:
             return None
 
     @classmethod
-    def create(cls, users):
+    def create_private(cls, users):
         chat_id = cls.get_chat_room_for_users(users)
         if not chat_id:
             chat_id = ChatRoomModel.create_chat()
@@ -95,19 +96,21 @@ class ChatRoom:
                 room = {
                     'name': others['name'],
                     'avatar': others['avatar'],
-                    'user_id': others['user_id']
+                    'user_id': others['user_id'],
                 }
-
             else:  # group
+                group = GroupModel.get_by_chat_id(chat_id)
                 room = {
-                    'name': chat.name
+                    'name': group.name,
+                    'avatar': group.avatar,
+                    'creator': group.creator,
                 }
-
             room['members'] = members
+            room['chat_type'] = chat_room.chat_type
             room['last_read'] = last_seen
             room['chat_id'] = chat_id
             room['messages'] = room_messages
-            room['time'] = room_messages[-1]['time'] if room_messages else ''
+            room['time'] = room_messages[-1]['time'] if room_messages else 0
             chat_rooms.append(room)
         chat_rooms = sorted(chat_rooms, key=lambda x: x['time'], reverse=True)
         return chat_rooms

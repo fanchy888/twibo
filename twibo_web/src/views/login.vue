@@ -48,7 +48,7 @@
         </el-form>
 
         <div class="foot">
-          Hava no account?
+          Have no account?
           <span class="foot-btn" @click="register">Register Now</span>
         </div>
       </div>

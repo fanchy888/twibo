@@ -32,7 +32,6 @@ export default {
   data() {
     return {
       chat: {},
-      groupList: [],
     };
   },
   computed: {
@@ -42,7 +41,7 @@ export default {
       friendList: (state) => state.Friend.friendList,
       chatList: (state) => state.Chat.chatList,
       currentChat: (state) => state.Chat.currentChat,
-      allMessages: (state) => state.Chat.messageList,
+      groupList: (state) => state.Chat.groupList,
     }),
   },
   // async mounted() {

@@ -198,11 +198,10 @@ class User:
         if not FriendModel.check_friendship(self.user_id, user_id):
             FriendModel.create_friendship(from_user, to_user)
 
-        chat_id = ChatRoom.create([self.user_id, user_id])
-
+        chat_id = ChatRoom.create_private([self.user_id, user_id])
+        self.say_hi(chat_id)
         socketIO.emit('clearRequest', [self.user_id, user_id], namespace='/twibo')
         socketIO.emit('createChat', [self.user_id, user_id], namespace='/twibo')
-        self.say_hi(chat_id)
 
     def reject_friend(self, user_id):
         request_model = FriendRequestModel.get_one(user_id, self.user_id)
@@ -230,11 +229,11 @@ class User:
         FriendModel.delete_friend(self.user_id, friend_user_id)
         ChatRoom.delete_chat([self.user_id, friend_user_id])
 
-    def say_hi(self, chat_id):
+    def say_hi(self, chat_id, msg='hi~'):
         msg = {
             'sender': self.user_id,
             'chat_id': chat_id,
-            'content': 'hi~'
+            'content': msg
         }
         Message.create(msg, False)
 
