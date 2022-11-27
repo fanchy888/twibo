@@ -70,6 +70,12 @@ def create_group():
     return jsonify(meta={'code': 200}, data={'group_id': group_id})
 
 
+@bp.route('/groups/<group_id>', methods=['GET'])
+def get_one_group(group_id):
+    data = Group(group_id).get_group_info()
+    return jsonify(meta={'code': 200}, data=data)
+
+
 @bp.route('/groups/<group_id>', methods=['DELETE'])
 @login_required
 def delete_group_chat(chat_id):
@@ -89,7 +95,7 @@ def edit_group_chat(group_id):
 @login_required
 def add_group_member(group_id):
     data = request.get_json()
-    Group(group_id).add_group_member(g.user_id, data['user_id'])
+    Group(group_id).add_group_member(g.user_id, data)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
@@ -105,5 +111,5 @@ def delete_group_member(group_id):
 @login_required
 def upload_group_avatar(group_id):
     file = request.files.get('file')
-    Group(group_id).upload_avatar(file)
-    return jsonify(meta={'code': 200}, data={'success': True})
+    name = Group(group_id).upload_avatar(file)
+    return jsonify(meta={'code': 200}, data={'avatar': name})

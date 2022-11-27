@@ -1,6 +1,7 @@
 import os
 from twibo_server.model.group import GroupModel
 from twibo_server.lib.uchat import ChatRoom
+from twibo_server.lib.user import User
 from twibo_server.model.chat import ChatRoomModel, ChatMemberModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server.config import config
@@ -29,6 +30,10 @@ class Group:
 
     def __getattr__(self, item):
         return getattr(self.model, item)
+
+    @classmethod
+    def creator_name(cls, creator):
+        return User(creator).name
 
     @classmethod
     def create_group(cls, creator, data, avatar=None):
@@ -74,10 +79,12 @@ class Group:
             group.delete()
 
     def edit_group(self, data):
-        description = data['description']
-        name = data['name']
-        self.model.name = name
-        self.model.description = description
+        description = data.get('description')
+        name = data.get('name')
+        if name:
+            self.model.name = name
+        if description:
+            self.model.description = description
         self.model.save()
 
     def upload_avatar(self, file):
@@ -106,17 +113,27 @@ class Group:
             members = chat_room.get_members()
 
             group_info['members'] = members
+            group_info['owner'] = cls.creator_name(group.creator)
             res.append(group_info)
         return res
 
-    def add_group_member(self, adder, user_id):
+    def get_group_info(self):
+        info = self.model.to_json()
+        chat_room = ChatRoom(self.chat_id)
+        members = chat_room.get_members()
+        info['members'] = members
+        info['owner'] = self.creator_name(self.creator)
+        return info
+
+    def add_group_member(self, adder, user_ids):
         if not ChatMemberModel.get_member(self.chat_id, adder):
             raise ParameterError(400, 'You are not in this group')
-        member = {
-            'chat_id': self.chat_id,
-            'user_id': user_id,
-        }
-        ChatMemberModel(**member).save()
+        for user_id in user_ids:
+            member = {
+                'chat_id': self.chat_id,
+                'user_id': user_id,
+            }
+            ChatMemberModel(**member).save()
 
     def kick_group_member(self, creator, user_id):
         if self.creator == user_id or self.creator != creator:

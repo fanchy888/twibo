@@ -6,6 +6,12 @@ export default [
     path: "/api/groups",
   },
   {
+    name: "getOneGroup",
+    method: "GET",
+    desc: "获取一个群",
+    path: "/api/groups/:group_id",
+  },
+  {
     name: "createGroup",
     method: "POST",
     desc: "建群",
@@ -18,10 +24,16 @@ export default [
     path: "/api/groups/:group_id",
   },
   {
-    name: "editGroups",
+    name: "editGroup",
     method: "PATCH",
     desc: "编辑群",
     path: "/api/groups/:group_id",
+  },
+  {
+    name: "editGroupAvatar",
+    method: "POST",
+    desc: "编辑群头像",
+    path: "/api/groups/:group_id/avatar",
   },
   {
     name: "addGroupMember",

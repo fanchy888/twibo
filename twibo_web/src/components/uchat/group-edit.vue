@@ -28,7 +28,7 @@
             v-model="groupForm.description"
             type="textarea"
             maxlength="50"
-            show-word-limitv-model="groupForm.description"
+            show-word-limit
           ></el-input>
         </el-form-item>
       </el-form>
@@ -41,20 +41,23 @@
           ></el-input>
         </div>
         <el-checkbox-group v-model="checkedMembers" class="checkGroup">
-          <div v-for="(friend, index) in filterdFriends" :key="index">
-            <el-checkbox :label="friend.user_id" class="checkItem">
-              <div class="checkItem">
-                <el-avatar :size="30" shape="square">
-                  <span style="font-size: 30px"
-                    ><i class="el-icon-user"></i
-                  ></span>
-                </el-avatar>
-                <span style="font-size: 20px; padding-left: 5px">{{
-                  friend.nick_name || friend.name
-                }}</span>
-              </div>
-            </el-checkbox>
-          </div>
+          <el-checkbox
+            :label="friend.user_id"
+            v-for="(friend, index) in filterdFriends"
+            :key="index"
+            class="checkItem"
+          >
+            <div class="checkItem">
+              <el-avatar :size="30" shape="square">
+                <span style="font-size: 30px"
+                  ><i class="el-icon-user"></i
+                ></span>
+              </el-avatar>
+              <span style="font-size: 20px; padding-left: 5px">{{
+                friend.nick_name || friend.name
+              }}</span>
+            </div>
+          </el-checkbox>
         </el-checkbox-group>
         <div class="tag">
           <el-tag

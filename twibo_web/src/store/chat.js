@@ -59,6 +59,16 @@ export default {
       commit("SET_STATE", { groupList: groups });
     },
 
+    async getOneGroup({ state, commit }, group_id) {
+      const group = await api.getOneGroup({ group_id });
+      const groups = state.groupList;
+      const targetGroup = groups.find((g) => g.group_id === group_id);
+      if (targetGroup) {
+        Object.keys(group).forEach((k) => (targetGroup[k] = group[k]));
+        commit("SET_STATE", { groupList: groups });
+      }
+    },
+
     SOCKET_chat({ dispatch }, receivedData) {
       dispatch("addMessage", receivedData);
     },
