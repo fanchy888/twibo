@@ -15,7 +15,7 @@
         group.name
       }}</span>
       <el-popover placement="right" width="350" ref="popRef">
-        <div class="pop-info">
+        <div class="pop-info" v-loading="loading">
           <el-avatar
             shape="square"
             v-if="group.avatar"
@@ -41,7 +41,7 @@
               type="success"
               size="small"
               icon="el-icon-chat-dot-round"
-              @click="jumpToChat(group, index)"
+              @click="jumpToChat()"
               >Chat</el-button
             >
             <el-button
@@ -49,7 +49,7 @@
               type="danger"
               size="small"
               icon="el-icon-delete"
-              @click="leaveGroup(group)"
+              @click="leaveGroup()"
               >Leave</el-button
             >
             <el-button
@@ -57,7 +57,7 @@
               type="danger"
               size="small"
               icon="el-icon-delete"
-              @click="dismissGroup(group)"
+              @click="dismissGroup()"
               >Dismiss</el-button
             >
           </div>
@@ -221,6 +221,7 @@ export default {
   props: ["group", "index"],
   data() {
     return {
+      loading: false,
       editLoading: false,
       groupVisible: false,
       memberVisible: false,
@@ -340,10 +341,47 @@ export default {
         });
         if (res.success) {
           this.$store.dispatch("getOneGroup", this.group.group_id);
+          this.$store.dispatch("getChatList");
           this.memberVisible = false;
         }
       } finally {
         this.editLoading = false;
+      }
+    },
+    async leaveGroup() {
+      const yes = await this.$confirm("Are you fucking sure?", {
+        confirmButtonText: "FUCK YOU ALL",
+        cancelButtonText: "Just kidding",
+        type: "warning",
+      }).catch(() => {});
+      if (!yes) {
+        return;
+      }
+      this.loading = true;
+
+      try {
+        await this.$api.quitGroup({
+          group_id: this.group.group_id,
+          user_id: this.user.user_id,
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+    async dismissGroup() {
+      const yes = await this.$confirm("Are you sure to dismiss this group?", {
+        confirmButtonText: "They deserve it!",
+        cancelButtonText: "Just kidding",
+        type: "warning",
+      }).catch(() => {});
+      if (!yes) {
+        return;
+      }
+      this.loading = true;
+      try {
+        await this.$api.deleteGroup({ group_id: this.group.group_id });
+      } finally {
+        this.loading = false;
       }
     },
     jumpToChat() {

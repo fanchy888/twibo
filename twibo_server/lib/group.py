@@ -1,4 +1,5 @@
 import os
+import copy
 from twibo_server.model.group import GroupModel
 from twibo_server.lib.uchat import ChatRoom
 from twibo_server.lib.user import User
@@ -73,10 +74,13 @@ class Group:
     @classmethod
     def delete_group(cls, creator, group_id):
         group = GroupModel.get(group_id)
+
         if group.creator == creator:
             chat_id = group.chat_id
+            name = group.name
             ChatRoomModel.delete_chat(chat_id)
             group.delete()
+            socketIO.emit('dismiss', {'name': name, 'chat_id': chat_id}, to=chat_id, namespace='/twibo')
 
     def edit_group(self, data):
         description = data.get('description')
@@ -134,11 +138,26 @@ class Group:
                 'user_id': user_id,
             }
             ChatMemberModel(**member).save()
+            socketIO.emit('invite', user_id, namespace='/twibo')
 
     def kick_group_member(self, creator, user_id):
         if self.creator == user_id or self.creator != creator:
             return
+        self._rmv_member(user_id)
+        socketIO.emit('kick', {'user_id': user_id, 'name': self.name, 'chat_id': self.chat_id},
+                      to=self.chat_id, namespace='/twibo')
+
+    def quit_group(self, user_id):
+        if self.creator == user_id:
+            return
+        self._rmv_member(user_id)
+        socketIO.emit('quit', {'user_id': user_id, 'group': self.name, 'chat_id': self.chat_id},
+                      to=self.chat_id, namespace='/twibo')
+
+    def _rmv_member(self, user_id):
         m = ChatMemberModel.get_member(self.chat_id, user_id)
         m.delete()
-        socketIO.emit('kick', {'user_id': user_id, 'group': self.name},
-                      to=self.chat_id, namespace='/twibo')
+        if self.manager:
+            managers = [u for u in copy.deepcopy(self.model.manager) if u != user_id ]
+            self.model.manager = managers
+            self.model.save()

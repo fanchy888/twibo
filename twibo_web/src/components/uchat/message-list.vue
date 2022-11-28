@@ -47,7 +47,7 @@
           <span style="font-size: 30px"><i class="el-icon-user"></i></span>
         </el-avatar>
         <div class="info">
-          <div class="title">{{ msg.name }}</div>
+          <div class="title">{{ msg.name || "DELETED" }}</div>
           <div class="content">
             <div class="detail" v-if="msg.content_type == 0">
               {{ msg.content }}

@@ -24,6 +24,11 @@ def join_chat(user_id):
     ChatRoom.join_chats(user_id)
 
 
+@socketIO.on('leaveChat', namespace='/twibo')
+def leave_chat(data):
+    ChatRoom.leave_chat(data['user_id'], data['chat_id'])
+
+
 @bp.route('/chats', methods=['GET'])
 def get_chats():
     user = User(g.user_id)
@@ -70,6 +75,14 @@ def create_group():
     return jsonify(meta={'code': 200}, data={'group_id': group_id})
 
 
+@bp.route('/groups/<group_id>/avatar', methods=['POST'])
+@login_required
+def upload_group_avatar(group_id):
+    file = request.files.get('file')
+    name = Group(group_id).upload_avatar(file)
+    return jsonify(meta={'code': 200}, data={'avatar': name})
+
+
 @bp.route('/groups/<group_id>', methods=['GET'])
 def get_one_group(group_id):
     data = Group(group_id).get_group_info()
@@ -78,8 +91,8 @@ def get_one_group(group_id):
 
 @bp.route('/groups/<group_id>', methods=['DELETE'])
 @login_required
-def delete_group_chat(chat_id):
-    Group.delete_group(g.user_id, chat_id)
+def delete_group_chat(group_id):
+    Group.delete_group(g.user_id, group_id)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
@@ -107,9 +120,10 @@ def delete_group_member(group_id):
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/groups/<group_id>/avatar', methods=['POST'])
+@bp.route('/groups/<group_id>/members/<user_id>', methods=['DELETE'])
 @login_required
-def upload_group_avatar(group_id):
-    file = request.files.get('file')
-    name = Group(group_id).upload_avatar(file)
-    return jsonify(meta={'code': 200}, data={'avatar': name})
+def quit_group(group_id, user_id):
+    if g.user_id != user_id:
+        abort(400, 'Access Denied')
+    Group(group_id).quit_group(user_id)
+    return jsonify(meta={'code': 200}, data={'success': True})

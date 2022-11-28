@@ -14,11 +14,16 @@ export default {
     },
   },
   actions: {
-    async getChatList({ rootState, commit }) {
+    async getChatList({ rootState, state, dispatch, commit }) {
       const param = { $query: { user_id: rootState.currentUser.user_id } };
       const chatList = await api.getChatList(param);
       commit("SET_STATE", { chatList: chatList });
       this._vm.$socket.emit("joinChat", rootState.currentUser.user_id);
+      if (state.currentChat.chat_id) {
+        const chat =
+          chatList.find((c) => c.chat_id === state.currentChat.chat_id) || {};
+        dispatch("changeChatRoom", chat);
+      }
     },
 
     addMessage({ rootState, state, commit }, msg) {
@@ -86,10 +91,40 @@ export default {
     },
     SOCKET_kick({ rootState, dispatch }, data) {
       if (data.user_id === rootState.currentUser.user_id) {
-        showNotification("You have been removed from group", data.name);
+        showNotification("You have been removed from this group", data.name);
+        this._vm.$socket.emit("leaveChat", {
+          user_id: rootState.currentUser.user_id,
+          chat_id: data.chat_id,
+        });
+      }
+      dispatch("getChatList");
+      dispatch("getGroups");
+    },
+    SOCKET_quit({ rootState, dispatch }, data) {
+      if (data.user_id === rootState.currentUser.user_id) {
+        this._vm.$socket.emit("leaveChat", {
+          user_id: rootState.currentUser.user_id,
+          chat_id: data.chat_id,
+        });
+      }
+      dispatch("getChatList");
+      dispatch("getGroups");
+    },
+    SOCKET_invite({ rootState, dispatch }, user_id) {
+      if (user_id === rootState.currentUser.user_id) {
         dispatch("getChatList");
         dispatch("getGroups");
       }
+    },
+    SOCKET_dismiss({ rootState, dispatch }, data) {
+      showNotification("You have been removed from this group", data.name);
+      this._vm.$socket.emit("leaveChat", {
+        user_id: rootState.currentUser.user_id,
+        chat_id: data.chat_id,
+      });
+
+      dispatch("getChatList");
+      dispatch("getGroups");
     },
   },
   getters: {},

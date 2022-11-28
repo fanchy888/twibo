@@ -8,7 +8,7 @@ from twibo_server.model.group import GroupModel
 from twibo_server.lib.exception import ParameterError
 from twibo_server import socketIO
 from twibo_server.config import config
-from flask_socketio import join_room, rooms
+from flask_socketio import join_room, rooms, leave_room
 from twibo_server.utils import logger
 from twibo_server.utils import generate_id, create_thumbnail
 
@@ -91,7 +91,7 @@ class ChatRoom:
                     m['name'] = friends[m['user_id']]['nick_name']
             last_seen = chat_room.get_member_last_read(user_id)
 
-            if len(members) == 2:  # private
+            if chat_room.chat_type == ChatRoomModel.PERSONAL:
                 others = [m for m in members if m['user_id'] != user_id][0]
                 room = {
                     'name': others['name'],
@@ -117,8 +117,12 @@ class ChatRoom:
 
     def user_active(self, user_id):
         m = ChatMemberModel.get_member(self.chat_id, user_id)
-        m.last_read = datetime.utcnow()
-        m.save()
+        if m:
+            m.last_read = datetime.utcnow()
+            m.save()
+
+    def check_member(self, user_id):
+        return ChatMemberModel.get_member(self.chat_id, user_id)
 
     @classmethod
     def join_chats(cls, user_id):
@@ -127,6 +131,11 @@ class ChatRoom:
             if chat.chat_id not in in_rooms:
                 join_room(chat.chat_id, namespace='/twibo')
                 logger.info(f'user{user_id} join room {chat.chat_id}')
+
+    @classmethod
+    def leave_chat(cls, user_id, chat_id):
+        leave_room(chat_id)
+        logger.info(f'user{user_id} leave room {chat_id}')
 
     def send_imgs(self, user, files):
         msgs = []

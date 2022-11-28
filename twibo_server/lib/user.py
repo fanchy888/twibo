@@ -238,5 +238,6 @@ class User:
         Message.create(msg, False)
 
     def send_msg(self, msg):
-        Message.create(msg)
-        ChatRoom(msg['chat_id']).user_active(self.user_id)
+        if ChatRoom(msg['chat_id']).check_member(msg['sender']):
+            Message.create(msg)
+            ChatRoom(msg['chat_id']).user_active(self.user_id)
