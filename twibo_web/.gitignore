@@ -2,7 +2,7 @@
 node_modules
 /dist
 public/images
-
+/ckeditor5
 # local env files
 .env.local
 .env.*.local
@@ -22,4 +22,3 @@ pnpm-debug.log*
 *.sln
 *.sw?
 # rsa.js
-vue.config.js

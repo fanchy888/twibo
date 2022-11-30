@@ -12,6 +12,7 @@ import JSEncrypt from "jsencrypt";
 import { rsaPublicKey } from "../../rsa";
 import { host } from "@/utils/common";
 import VueCookies from "vue-cookies";
+import CKEditor from "@ckeditor/ckeditor5-vue2";
 Vue.config.productionTip = false;
 
 Vue.prototype.$getRsaCode = function (str) {
@@ -21,6 +22,7 @@ Vue.prototype.$getRsaCode = function (str) {
   let data = encryptStr.encrypt(str.toString());
   return data;
 };
+Vue.use(CKEditor);
 
 Vue.use(VueCookies);
 Vue.use(ElementUI);
