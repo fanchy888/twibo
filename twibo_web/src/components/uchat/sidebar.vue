@@ -279,7 +279,7 @@
 import { mapState, mapActions } from "vuex";
 import { convertTime, avatarSrc } from "@/utils/common";
 import groupChat from "./group-item";
-import groupEdit from "./group-edit";
+import groupEdit from "./group-create";
 export default {
   name: "sideBar",
   components: { groupChat, groupEdit },

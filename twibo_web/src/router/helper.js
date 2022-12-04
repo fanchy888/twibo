@@ -33,6 +33,7 @@ export const makeRouteConfig = (obj) => {
       },
     };
     res2.component = o2.component;
+    res2.children = o2.children;
     return res2;
   });
   return res;

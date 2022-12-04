@@ -112,11 +112,11 @@ def add_group_member(group_id):
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
-@bp.route('/groups/<group_id>/members', methods=['DELETE'])
+@bp.route('/groups/<group_id>/members', methods=['PATCH'])
 @login_required
 def delete_group_member(group_id):
     data = request.get_json()
-    Group(group_id).kick_group_member(g.user_id, data['user_id'])
+    Group(group_id).kick_group_members(g.user_id, data['user_ids'])
     return jsonify(meta={'code': 200}, data={'success': True})
 
 

@@ -26,7 +26,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .editor {
-  line-height: 20px;
-  text-align: left;
+  height: 200px;
 }
 </style>

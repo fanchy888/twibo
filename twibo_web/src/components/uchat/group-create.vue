@@ -48,7 +48,15 @@
             class="checkItem"
           >
             <div class="checkItem">
-              <el-avatar :size="30" shape="square">
+              <el-avatar
+                v-if="friend.avatar"
+                :src="avatarSrc(friend.avatar)"
+                :size="30"
+                fit="contain"
+                shape="square"
+              >
+              </el-avatar>
+              <el-avatar v-else :size="30" shape="square">
                 <span style="font-size: 30px"
                   ><i class="el-icon-user"></i
                 ></span>
@@ -112,6 +120,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { avatarSrc } from "@/utils/common";
 
 export default {
   name: "groupEdit",
@@ -142,6 +151,7 @@ export default {
     },
   },
   methods: {
+    avatarSrc,
     ...mapActions(["getGroups", "getChatList"]),
     rmvTag(user_id) {
       this.checkedMembers.splice(this.checkedMembers.indexOf(user_id), 1);

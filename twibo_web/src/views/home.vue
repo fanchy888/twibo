@@ -39,15 +39,15 @@
             class="menu"
             router
           >
-            <el-menu-item index="twibo">
+            <el-menu-item index="twibo" :route="{ name: 'twibo' }">
               <i class="el-icon-s-promotion"></i>
               <span slot="title">Twibo</span>
             </el-menu-item>
-            <el-menu-item index="uchat">
+            <el-menu-item index="uchat" :route="{ name: 'uchat' }">
               <i class="el-icon-s-comment"></i>
               <span slot="title">μChat</span>
             </el-menu-item>
-            <el-menu-item index="notes">
+            <el-menu-item index="notes" :route="{ name: 'notes' }">
               <i class="el-icon-edit"></i>
               <span slot="title">Notes</span>
             </el-menu-item>
@@ -153,7 +153,6 @@ export default {
 }
 
 .el-aside {
-  line-height: 200px;
   height: 100%;
   width: 200px !important;
 }
@@ -161,8 +160,7 @@ export default {
 .el-main {
   background-color: #fffaf4;
   color: #333;
-  text-align: center;
-  line-height: 160px;
+  // text-align: center;
 }
 .menu {
   width: 200px;

@@ -43,14 +43,14 @@ export default [
   },
   {
     name: "kickGroupMember",
-    method: "DELETE",
+    method: "PATCH",
     desc: "踢人",
     path: "/api/groups/:group_id/members",
   },
   {
     name: "quitGroup",
     method: "DELETE",
-    desc: "踢人",
+    desc: "退群",
     path: "/api/groups/:group_id/members/:user_id",
   },
 ];

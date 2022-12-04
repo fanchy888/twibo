@@ -122,11 +122,7 @@
         <div class="members">
           <el-divider>Members</el-divider>
           <el-row :gutter="0" class="row">
-            <el-col
-              :span="3"
-              v-for="(member, index) in group.members"
-              :key="index"
-            >
+            <el-col :span="3" v-for="(member, index) in members" :key="index">
               <el-tooltip
                 effect="dark"
                 :content="member.name"
@@ -158,7 +154,11 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog width="40%" :visible.sync="memberVisible" @close="closeMember">
+    <el-dialog
+      width="40%"
+      :visible.sync="memberVisible"
+      @close="closeMemberDialog"
+    >
       <div
         v-if="memberMode === 'add'"
         v-loading="editLoading"
@@ -181,7 +181,14 @@
             :disabled="checked(friend.user_id)"
           >
             <div class="checkItem">
-              <el-avatar :size="30" shape="square">
+              <el-avatar
+                v-if="friend.avatar"
+                :src="avatarSrc(friend.avatar)"
+                :size="30"
+                fit="contain"
+                shape="square"
+              ></el-avatar>
+              <el-avatar v-else :size="30" shape="square">
                 <span style="font-size: 30px"
                   ><i class="el-icon-user"></i
                 ></span>
@@ -208,7 +215,57 @@
           <el-button @click="invite()" type="primary">Invite</el-button>
         </div>
       </div>
-      <div v-else v-loading="editLoading" class="member-dialog">Kick</div>
+      <div v-else v-loading="editLoading" class="member-dialog">
+        Kick Members
+        <div style="line-height: 50px; width: 400px">
+          <el-input
+            prefix-icon="el-icon-search"
+            v-model="searchInfo"
+            placeholder="search"
+          ></el-input>
+        </div>
+        <el-checkbox-group v-model="kickedMembers" class="checkGroup">
+          <el-checkbox
+            v-for="(member, index) in filterdMembers"
+            :key="index"
+            :label="member.user_id"
+            class="checkItem"
+          >
+            <div class="checkItem">
+              <el-avatar
+                v-if="member.avatar"
+                :src="avatarSrc(member.avatar)"
+                :size="30"
+                fit="contain"
+                shape="square"
+              ></el-avatar>
+              <el-avatar v-else :size="30" shape="square">
+                <span style="font-size: 30px"
+                  ><i class="el-icon-user"></i
+                ></span>
+              </el-avatar>
+              <span style="font-size: 20px; padding-left: 5px">{{
+                member.name
+              }}</span>
+            </div>
+          </el-checkbox>
+        </el-checkbox-group>
+        <div class="tag">
+          <el-tag
+            v-for="user_id in kickedMembers"
+            :key="user_id"
+            type="danger"
+            style="margin: 3px"
+            closable
+            @close="rmvKickedTag(user_id)"
+          >
+            {{ findMember(user_id).name }}
+          </el-tag>
+        </div>
+        <div>
+          <el-button @click="kick()" type="danger">Kick</el-button>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -227,7 +284,7 @@ export default {
       memberVisible: false,
       memberMode: "add",
       checkedMembers: [],
-
+      kickedMembers: [],
       searchInfo: "",
       groupForm: {
         name: this.group.name,
@@ -253,6 +310,22 @@ export default {
         (f) =>
           (f.nick_name && f.nick_name.includes(this.searchInfo)) ||
           f.name.includes(this.searchInfo)
+      );
+    },
+
+    members() {
+      return this.group.members.map((m) => {
+        m.name = this.findFriend(m.user_id).nick_name || m.name;
+        return m;
+      });
+    },
+
+    filterdMembers() {
+      return this.members.filter(
+        (f) =>
+          f.user_id !== this.group.creator &&
+          ((f.nick_name && f.nick_name.includes(this.searchInfo)) ||
+            f.name.includes(this.searchInfo))
       );
     },
   },
@@ -311,11 +384,14 @@ export default {
     rmvTag(user_id) {
       this.checkedMembers.splice(this.checkedMembers.indexOf(user_id), 1);
     },
+    rmvKickedTag(user_id) {
+      this.kickedMembers.splice(this.kickedMembers.indexOf(user_id), 1);
+    },
     findFriend(user_id) {
       return this.friendList.find((f) => f.user_id === user_id) || {};
     },
     findMember(user_id) {
-      return this.group.members.find((f) => f.user_id === user_id) || {};
+      return this.members.find((f) => f.user_id === user_id) || {};
     },
     clickAdd() {
       this.memberVisible = true;
@@ -328,8 +404,9 @@ export default {
     checked(user_id) {
       return this.group.members.map((m) => m.user_id).includes(user_id);
     },
-    closeMember() {
+    closeMemberDialog() {
       this.checkedMembers = [];
+      this.kickedMembers = [];
       this.searchInfo = "";
     },
     async invite() {
@@ -348,6 +425,24 @@ export default {
         this.editLoading = false;
       }
     },
+
+    async kick() {
+      this.editLoading = true;
+      try {
+        const res = await this.$api.kickGroupMember({
+          group_id: this.group.group_id,
+          $body: { user_ids: this.kickedMembers },
+        });
+        if (res.success) {
+          this.$store.dispatch("getOneGroup", this.group.group_id);
+          this.$store.dispatch("getChatList");
+          this.memberVisible = false;
+        }
+      } finally {
+        this.editLoading = false;
+      }
+    },
+
     async leaveGroup() {
       const yes = await this.$confirm("Are you fucking sure?", {
         confirmButtonText: "FUCK YOU ALL",

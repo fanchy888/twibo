@@ -140,12 +140,13 @@ class Group:
             ChatMemberModel(**member).save()
             socketIO.emit('invite', user_id, namespace='/twibo')
 
-    def kick_group_member(self, creator, user_id):
-        if self.creator == user_id or self.creator != creator:
-            return
-        self._rmv_member(user_id)
-        socketIO.emit('kick', {'user_id': user_id, 'name': self.name, 'chat_id': self.chat_id},
-                      to=self.chat_id, namespace='/twibo')
+    def kick_group_members(self, creator, user_ids):
+        for user_id in user_ids:
+            if self.creator == user_id or self.creator != creator:
+                return
+            self._rmv_member(user_id)
+            socketIO.emit('kick', {'user_id': user_id, 'name': self.name, 'chat_id': self.chat_id},
+                          to=self.chat_id, namespace='/twibo')
 
     def quit_group(self, user_id):
         if self.creator == user_id:
