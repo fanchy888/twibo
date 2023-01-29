@@ -1,4 +1,4 @@
-from twibo_server.model.group import Base
+from twibo_server.model.blog import Base
 from sqlalchemy import create_engine
 from twibo_server.config import config
 

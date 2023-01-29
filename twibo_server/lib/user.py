@@ -31,6 +31,9 @@ class User:
     def __getattr__(self, item):
         return getattr(self.model, item)
 
+    def to_json(self):
+        return self.model.to_json()
+
     @classmethod
     def get_user(cls, user_id):
         user = UserModel.get(user_id)
@@ -136,6 +139,10 @@ class User:
             raise ParameterError(400, 'Password incorrect')
         self.model.password = new
         self.model.save()
+
+    @property
+    def friends(self):
+        return {f['user_id']: f for f in self.get_friends()}
 
     def get_friends(self):
         friend_models = UserModel.get_friends(self.user_id)

@@ -47,9 +47,9 @@
               <i class="el-icon-s-comment"></i>
               <span slot="title">μChat</span>
             </el-menu-item>
-            <el-menu-item index="notes" :route="{ name: 'notes' }">
-              <i class="el-icon-edit"></i>
-              <span slot="title">Notes</span>
+            <el-menu-item index="bytetok" :route="{ name: 'bytetok' }">
+              <i class="el-icon-potato-strips"></i>
+              <span slot="title">ByteTok</span>
             </el-menu-item>
           </el-menu>
         </el-col>

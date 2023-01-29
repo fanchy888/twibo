@@ -1,10 +1,11 @@
 import home from "@/views/home";
 import youChat from "@/components/uchat";
 import twibo from "@/components/twibo";
-import notes from "@/components/notes";
+import ByteTok from "@/components/ByteTok";
 import setting from "@/components/setting";
 import editTwibo from "@/components/twibo/edit";
-import blog from "@/components/twibo/blogs";
+import blogs from "@/components/twibo/blogs";
+import blogPage from "@/components/twibo/blog";
 export default {
   title: "home",
   icon: "home",
@@ -27,7 +28,7 @@ export default {
       children: [
         {
           path: "",
-          component: blog,
+          component: blogs,
           name: "twibo",
         },
         {
@@ -37,13 +38,27 @@ export default {
           component: editTwibo,
           props: (route) => ({ query: route.query }),
         },
+        {
+          title: "editBlog",
+          name: "editBlog",
+          path: "edit/:blog_id",
+          component: editTwibo,
+          props: (route) => ({ query: route.query }),
+        },
+        {
+          title: "blogPage",
+          name: "blogPage",
+          path: ":blog_id",
+          component: blogPage,
+          props: (route) => ({ query: route.query }),
+        },
       ],
     },
     {
-      title: "notes",
-      name: "notes",
-      path: "/notes",
-      component: notes,
+      title: "bytetok",
+      name: "bytetok",
+      path: "/bytetok",
+      component: ByteTok,
       props: (route) => ({ query: route.query }),
     },
     {

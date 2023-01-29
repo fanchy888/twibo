@@ -31,6 +31,10 @@ class Config:
         return self.cfg_data['static_file_path'] + 'img/'
 
     @property
+    def blog_img_url(self):
+        return self.cfg_data['blog_img_url'] + 'img/'
+
+    @property
     def img_type(self):
         return {'jpg', 'png', 'jpeg', 'gif'}
 

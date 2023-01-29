@@ -18,12 +18,18 @@ export function convertTime(t) {
   if (!t) return "";
   const time = new Date(t * 1000 - timedelta);
   const year = time.getFullYear();
-  const month = time.getMonth() + 1;
-  const day = time.getDate();
+  let month = time.getMonth() + 1;
+  let day = time.getDate();
   const hour = time.getHours();
   let minite = time.getMinutes();
   if (minite < 10) {
     minite = "0" + minite;
+  }
+  if (month < 10) {
+    month = "0" + month;
+  }
+  if (day < 10) {
+    day = "0" + day;
   }
   return year + "-" + month + "-" + day + " " + hour + ":" + minite;
 }

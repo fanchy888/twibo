@@ -306,7 +306,7 @@ export default {
         const res = await this.$api.changePassword(param);
         if (res.success) {
           this.$message({
-            message: "密码更新成功",
+            message: "Password update successfully",
             type: "success",
           });
           this.passwordVisible = false;
