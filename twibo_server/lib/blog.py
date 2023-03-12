@@ -107,7 +107,6 @@ class Blog:
     def get_comments(self, user):
         comments_list = []
         comments = CommentModel.get_all(self.blog_id)
-        friends = user.friends
         for comment in comments:
             com = comment.to_json()
             comments_list.append(com)

@@ -32,3 +32,4 @@ from . import user
 from . import socket
 from . import uchat
 from . import blog
+from . import project
