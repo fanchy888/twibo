@@ -69,4 +69,5 @@ class ProjectTaskModel(Base, MixinBase):
             'title': self.title,
             'content': self.content,
             'progress': self.progress,
+            'create_date': self.create_time.timestamp()
         }

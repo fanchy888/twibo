@@ -68,14 +68,15 @@ def update_task(project_id, task_id):
     data = request.get_json()
     title = data['title']
     content = data['content']
-    ProjectTask(project_id, task_id).update(title, content)
+    progress = data['progress']
+    ProjectTask(project_id, task_id).update(title, content, progress)
     return jsonify(meta={'code': 200}, data={'success': True})
 
 
 @bp.route('/projects/<project_id>/tasks/<task_id>', methods=['DELETE'])
 @login_required
 def delete_task(project_id, task_id):
-    ProjectTask(project_id, task_id).delete()
+    ProjectTask(project_id, task_id).archive()
     return jsonify(meta={'code': 200}, data={'success': True})
 
 

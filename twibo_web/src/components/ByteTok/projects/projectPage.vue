@@ -2,15 +2,29 @@
   <div>
     <el-page-header :content="project.name" @back="goBack"> </el-page-header>
     <el-divider><i class="el-icon-s-data"></i></el-divider>
-    <div class="description">{{ project.theme }}</div>
 
-    <taskItem
-      v-for="(task, index) in tasks"
-      :key="index"
-      :task="task"
-      @clickEdit="clickEdit"
-    ></taskItem>
-
+    <div class="description">
+      {{ project.theme }}
+    </div>
+    <div class="switch">
+      show archived
+      <el-switch v-model="showArchived" active-color="#13ce66"> </el-switch>
+    </div>
+    <el-timeline>
+      <el-timeline-item
+        :timestamp="convertTime(task.create_date)"
+        placement="top"
+        v-for="(task, index) in filteredTasks"
+        :key="index"
+      >
+        <taskItem
+          :task="task"
+          :project_id="project_id"
+          @clickEdit="clickEdit(task)"
+          @clickArchive="reloadTasks"
+        ></taskItem>
+      </el-timeline-item>
+    </el-timeline>
     <el-button
       style="margin-top: 20px"
       type="success"
@@ -19,17 +33,17 @@
       >Add Task</el-button
     >
     <el-dialog
-      title="Create a Task"
+      :title="mode === 'create' ? 'Create' : 'Edit'"
       :visible.sync="taskVisible"
       destroy-on-close
       v-loading="loading"
       :show-close="false"
     >
       <el-form label-position="right" label-width="80px" :model="taskForm">
-        <el-form-item label="name">
-          <el-input v-model="taskForm.name" maxlength="500"></el-input>
+        <el-form-item label="title">
+          <el-input v-model="taskForm.title" maxlength="500"></el-input>
         </el-form-item>
-        <el-form-item label="detail">
+        <el-form-item label="content">
           <el-input
             v-model="taskForm.content"
             type="textarea"
@@ -38,10 +52,16 @@
             show-word-limit
           ></el-input>
         </el-form-item>
+        <el-form-item label="progress" v-if="selectedTask.task_id">
+          <el-slider
+            v-model="taskForm.progress"
+            style="padding-left: 10px; width: 80%"
+          ></el-slider>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="taskVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitTask">Create</el-button>
+        <el-button type="primary" @click="submitTask()">Submit</el-button>
       </span>
     </el-dialog>
   </div>
@@ -49,6 +69,8 @@
 
 <script>
 import taskItem from "./task";
+import { convertTime } from "@/utils/common";
+
 export default {
   name: "projectPage",
   components: { taskItem },
@@ -58,13 +80,25 @@ export default {
       project: {},
       mode: "create",
       loading: false,
+      showArchived: false,
       tasks: [],
+      selectedTask: {},
       taskForm: {
-        name: "",
+        title: "",
         content: "",
+        progress: 0,
       },
       taskVisible: false,
     };
+  },
+  computed: {
+    filteredTasks() {
+      if (this.showArchived) {
+        return this.tasks;
+      } else {
+        return this.tasks.filter((t) => !t.archived);
+      }
+    },
   },
   async mounted() {
     this.project_id = this.$route.params.project_id;
@@ -74,18 +108,27 @@ export default {
     this.tasks = this.project.tasks;
   },
   methods: {
+    convertTime,
     goBack() {
       this.$router.back();
     },
     clickCreate() {
       this.mode = "create";
       this.taskVisible = true;
+      this.taskForm.title = "";
+      this.taskForm.content = "";
+      this.taskForm.progress = 0;
+      this.selectedTask = {};
     },
-    clickEdit() {
+    clickEdit(task) {
       this.mode = "edit";
       this.taskVisible = true;
+      this.selectedTask = task;
+      this.taskForm.title = task.title;
+      this.taskForm.content = task.content;
+      this.taskForm.progress = task.progress;
     },
-    async submitTask(task_id) {
+    async submitTask() {
       this.loading = true;
 
       try {
@@ -93,26 +136,38 @@ export default {
           await this.$api.createTask({
             project_id: this.project_id,
             $body: {
-              title: this.taskForm.name,
+              title: this.taskForm.title,
               content: this.taskForm.content,
             },
           });
         } else {
           await this.$api.updateTask({
             project_id: this.project_id,
-            task_id: task_id,
+            task_id: this.selectedTask.task_id,
             $body: {
-              title: this.taskForm.name,
+              title: this.taskForm.title,
               content: this.taskForm.content,
+              progress: this.taskForm.progress,
             },
           });
         }
-        this.tasks = await this.$api.getTasks({ project_id: this.project_id });
+        await this.reloadTasks();
       } finally {
         this.loading = false;
         this.taskVisible = false;
         this.taskForm.name = "";
         this.taskForm.content = "";
+        this.taskForm.progress = 0;
+        this.selectedTask = {};
+      }
+    },
+
+    async reloadTasks() {
+      this.loading = true;
+      try {
+        this.tasks = await this.$api.getTasks({ project_id: this.project_id });
+      } finally {
+        this.loading = false;
       }
     },
   },
@@ -123,5 +178,10 @@ export default {
   color: #999;
   font-size: 20px;
   padding: 20px;
+}
+.switch {
+  color: #999;
+  padding-bottom: 20px;
+  text-align: right;
 }
 </style>

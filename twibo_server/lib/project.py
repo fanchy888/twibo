@@ -105,9 +105,11 @@ class ProjectTask:
     def create(cls, task_data):
         ProjectTaskModel(**task_data).save()
 
-    def update(self, title, content):
+    def update(self, title, content, progress):
         self.model.title = title
         self.model.content = content
+        self.model.progress = progress
+        self.model.save()
 
     def archive(self):
         self.model.archived = True

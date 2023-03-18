@@ -49,7 +49,7 @@ export default [
     path: "/api/projects/:project_id/tasks/:task_id",
   },
   {
-    name: "deleteTasks",
+    name: "deleteTask",
     method: "DELETE",
     desc: "get project tasks",
     path: "/api/projects/:project_id/tasks/:task_id",

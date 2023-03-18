@@ -6,7 +6,7 @@
           <span class="title">{{ project.name }}</span></el-button
         >
         <el-button
-          type="danger"
+          type="warning"
           circle
           plain
           @click="deleteProject"
