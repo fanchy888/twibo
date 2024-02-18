@@ -29,9 +29,8 @@ class BlogModel(Base, MixinBase):
     @classmethod
     def get_blogs(cls, keyword, limit=None, offset=None):
         with session_manager() as session:
-            q = session.query(cls).order_by(cls.update_time.desc())
+            q = session.query(cls).order_by(cls.create_time.desc())
             if keyword:
-
                 q = q.filter(cls.title.contains(keyword))
             if limit:
                 q = q.limit(limit)

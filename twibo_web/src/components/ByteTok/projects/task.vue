@@ -130,10 +130,15 @@ export default {
 .content {
   padding-bottom: 20px;
   color: rgb(84, 92, 100);
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-line;
 }
 .content-archive {
   padding-bottom: 20px;
-
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-line;
   color: #a6a6a8;
 }
 .footer {

@@ -1,13 +1,19 @@
 import home from "@/views/home";
 import youChat from "@/components/uchat";
-import twibo from "@/components/twibo";
 import setting from "@/components/setting";
+
+import twibo from "@/components/twibo";
 import editTwibo from "@/components/twibo/edit";
 import blogs from "@/components/twibo/blogs";
 import blogPage from "@/components/twibo/blog";
+
 import bytetok from "@/components/ByteTok";
 import project from "@/components/ByteTok/projects";
 import projectPage from "@/components/ByteTok/projects/projectPage";
+
+import PinPinDuo from "@/components/pinpinduo";
+import basePinPinDuo from "@/components/pinpinduo/base";
+
 export default {
   title: "home",
   icon: "home",
@@ -74,6 +80,20 @@ export default {
           path: ":project_id",
           component: projectPage,
           props: (route) => ({ query: route.query }),
+        },
+      ],
+    },
+    {
+      title: "pinpinduo",
+      name: "pinpinduo",
+      path: "/pinpinduo",
+      component: PinPinDuo,
+      props: (route) => ({ query: route.query }),
+      children: [
+        {
+          path: "",
+          component: basePinPinDuo,
+          name: "pinpinduo",
         },
       ],
     },

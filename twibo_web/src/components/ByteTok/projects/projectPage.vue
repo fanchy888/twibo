@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="project.name">
     <el-page-header :content="project.name" @back="goBack"> </el-page-header>
     <el-divider><i class="el-icon-s-data"></i></el-divider>
 
@@ -15,7 +15,7 @@
         :timestamp="convertTime(task.create_date)"
         placement="top"
         v-for="(task, index) in filteredTasks"
-        :key="index"
+        :key="task.name + index"
       >
         <taskItem
           :task="task"
@@ -65,6 +65,7 @@
       </span>
     </el-dialog>
   </div>
+  <el-empty v-else description="Byte will not dance"></el-empty>
 </template>
 
 <script>

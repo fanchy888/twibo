@@ -51,6 +51,10 @@
               <i class="el-icon-potato-strips"></i>
               <span slot="title">ByteTok</span>
             </el-menu-item>
+            <el-menu-item index="pinpinduo" :route="{ name: 'pinpinduo' }">
+              <i class="el-icon-goods"></i>
+              <span slot="title">PinPinDuo</span>
+            </el-menu-item>
           </el-menu>
         </el-col>
       </el-aside>
