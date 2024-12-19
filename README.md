@@ -1,2 +1,2 @@
 # twibo
-plog & online chat
+blog & online chat & some new features
